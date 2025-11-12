@@ -1,9 +1,8 @@
 # .chezmoi.yaml.tmpl
 data:
-  os: "{{ .chezmoi.os }}"     # 自动识别系统
-  user: "{{ replace .chezmoi.username `\` `\\` }}"
+  os: "{{ .chezmoi.os }}"
+  user: '{{ replace .chezmoi.username `\` `\\` }}'
 
-# 不同系统的特定选项
 {{ if eq .chezmoi.os "linux" }}
 sourceDir: "~/dotfiles"
 {{ else if eq .chezmoi.os "darwin" }}
@@ -11,4 +10,3 @@ sourceDir: "~/dotfiles"
 {{ else if eq .chezmoi.os "windows" }}
 sourceDir: "C:/Users/{{ replace .chezmoi.username `\` `/` }}/dotfiles"
 {{ end }}
-
