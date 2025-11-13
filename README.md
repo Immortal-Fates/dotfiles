@@ -2,7 +2,24 @@
 I use this repo to manage my dotfiles of different systems.
 
 # Ubuntu
-install zsh theme on your own hand
+- Init
+  
+  ```
+  chezmoi init --apply https://github.com/Immortal-Fates/dotfiles.git
+  ```
+- Synchronize
+  ```
+  chezmoi update
+  ```
 
+- Update
+  ```
+  chezmoi add ~/.*
+  chezmoi diff
+  chezmoi cd
+  # use git to commit
+
+  ```
 
 # Windows
+why config for windows? Tired
