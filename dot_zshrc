@@ -105,6 +105,4 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias vim='nvim'
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-
 eval "$(starship init zsh)"

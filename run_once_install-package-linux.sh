@@ -40,10 +40,15 @@ fi
 # 安装 Oh My Zsh + Starship
 echo "🌟 Installing Oh My Zsh and Starship prompt..."
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  export RUNZSH=no
+  export CHSH=no
+  export KEEP_ZSHRC=yes
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 else
   echo "✅ Oh My Zsh already installed."
 fi
+# reset again to avoid be warpped by Oh My Zsh
+chezmoi apply --force ~/.zshrc
 
 if ! command -v starship >/dev/null; then
   echo "💫 Installing Starship..."
@@ -52,11 +57,82 @@ else
   echo "✅ Starship already installed ($(starship --version))"
 fi
 
-# 配置 Starship 自动加载到 zsh
-if ! grep -q 'eval "$(starship init zsh)"' ~/.zshrc; then
-  echo 'eval "$(starship init zsh)"' >> ~/.zshrc
-  echo "✨ Added Starship initialization to ~/.zshrc"
+echo "🔧 Installing Zsh plugins..."
+
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+
+# -----------------------------------------------------------------------------
+# zsh-autosuggestions
+# -----------------------------------------------------------------------------
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+  echo "⬇️ Installing zsh-autosuggestions..."
+  git clone https://github.com/zsh-users/zsh-autosuggestions \
+    "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+else
+  echo "✅ zsh-autosuggestions already installed."
 fi
+
+# -----------------------------------------------------------------------------
+# zsh-syntax-highlighting
+# -----------------------------------------------------------------------------
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+  echo "⬇️ Installing zsh-syntax-highlighting..."
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting \
+    "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+else
+  echo "✅ zsh-syntax-highlighting already installed."
+fi
+
+# -----------------------------------------------------------------------------
+# zsh-vi-mode
+# -----------------------------------------------------------------------------
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-vi-mode" ]; then
+  echo "⬇️ Installing zsh-vi-mode..."
+  git clone https://github.com/jeffreytse/zsh-vi-mode \
+    "$ZSH_CUSTOM/plugins/zsh-vi-mode"
+else
+  echo "✅ zsh-vi-mode already installed."
+fi
+
+# -----------------------------------------------------------------------------
+# autojump
+# -----------------------------------------------------------------------------
+if ! command -v autojump >/dev/null 2>&1; then
+  echo "⬇️ Installing autojump..."
+  sudo apt install -y autojump
+else
+  echo "✅ autojump already installed."
+fi
+
+echo "🎉 Zsh plugin installation completed."
+
+install_jetbrains_nerd_font() {
+  echo "🔍 Checking JetBrainsMono Nerd Font..."
+
+  if fc-list | grep -qi "JetBrainsMono Nerd Font"; then
+    echo "✅ JetBrainsMono Nerd Font already installed."
+    return
+  fi
+
+  echo "⬇️ Downloading JetBrainsMono Nerd Font..."
+  TMP_DIR=$(mktemp -d)
+  ZIP_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"
+  ZIP_FILE="$TMP_DIR/JetBrainsMono.zip"
+
+  curl -L -o "$ZIP_FILE" "$ZIP_URL"
+
+  echo "📦 Installing..."
+  FONT_DIR="$HOME/.local/share/fonts/JetBrainsMono"
+  mkdir -p "$FONT_DIR"
+  unzip -q "$ZIP_FILE" -d "$FONT_DIR"
+
+  echo "🔄 Refreshing font cache..."
+  fc-cache -fv >/dev/null
+
+  echo "🎉 JetBrainsMono Nerd Font installed successfully!"
+}
+
+install_jetbrains_nerd_font
 
 # 更改默认 shell 为 zsh
 if [ "$SHELL" != "$(which zsh)" ]; then
