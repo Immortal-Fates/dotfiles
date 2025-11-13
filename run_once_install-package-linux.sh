@@ -13,9 +13,8 @@ if ! command -v wezterm >/dev/null 2>&1; then
 
   sudo mkdir -p /usr/share/keyrings
   curl -fsSL https://apt.fury.io/wez/gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/wezterm-archive-keyring.gpg
-
-  echo "deb [signed-by=/usr/share/keyrings/wezterm-archive-keyring.gpg] https://apt.fury.io/wez/ /" \
-    | sudo tee /etc/apt/sources.list.d/wezterm.list > /dev/null
+  echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' | sudo tee /etc/apt/sources.list.d/wezterm.list
+  sudo chmod 644 /usr/share/keyrings/wezterm-fury.gpg
 
   sudo apt update
   sudo apt install -y wezterm
@@ -48,7 +47,7 @@ fi
 
 if ! command -v starship >/dev/null; then
   echo "💫 Installing Starship..."
-  curl -fsSL https://starship.rs/install.sh | bash -s -- -y
+  curl -fsSL https://starship.rs/install.sh | sh -s -- -y
 else
   echo "✅ Starship already installed ($(starship --version))"
 fi
