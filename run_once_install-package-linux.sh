@@ -57,6 +57,9 @@ else
   echo "✅ Starship already installed ($(starship --version))"
 fi
 
+mkdir -p ~/.config && touch ~/.config/starship.toml
+starship preset pastel-powerline -o ~/.config/starship.toml
+
 echo "🔧 Installing Zsh plugins..."
 
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
