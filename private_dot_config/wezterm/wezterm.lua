@@ -19,13 +19,14 @@ config.font = wezterm.font_with_fallback({
   "Noto Color Emoji",         -- Emoji 备用
 })
 
-config.font_size = 13.0
+
+config.font_size = 16.0
 
 -- 颜色主题
 config.color_scheme = "Catppuccin Mocha"  -- 可用 wezterm ls-colors 查看全部主题
 
 -- 背景透明度
-config.window_background_opacity = 0.95
+config.window_background_opacity = 0.8
 config.text_background_opacity = 1.0
 
 -- 光标样式
