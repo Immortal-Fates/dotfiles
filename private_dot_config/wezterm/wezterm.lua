@@ -27,6 +27,14 @@ config.text_background_opacity = 1.0
 
 config.default_cursor_style = "BlinkingBar"
 
+-- Background picture
+config.window_background_image = wezterm.home_dir .. "/dotfiles/assets/xuenai.png"
+
+config.window_background_image_hsb = {
+  brightness = 0.2,
+}
+
+
 -- No title bar but keep resize borders
 config.window_decorations = "RESIZE"
 
