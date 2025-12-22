@@ -105,6 +105,7 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias vim='nvim'
 
+setopt HIST_IGNORE_SPACE
 eval "$(starship init zsh)"
 
 # >>> conda initialize >>>
@@ -124,3 +125,10 @@ unset __conda_setup
 
 
 . "$HOME/.local/bin/env"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# init ros
+source /opt/ros/humble/setup.zsh
+

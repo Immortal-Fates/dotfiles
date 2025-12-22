@@ -54,6 +54,9 @@ Todo
 
 No matter what browser are you using. Remember to load the vim extention.
 
+- Extension list
+  - CopyTex: double click to copy tex from AI chat
+
 ## Todo
 
 - [ ] use all the config in lua
