@@ -15,6 +15,7 @@ end
 
 config.font = wezterm.font_with_fallback({
   "JetBrainsMono Nerd Font",
+  "Sarasa Mono SC",
   "Noto Color Emoji",
 })
 
@@ -111,4 +112,3 @@ config.keys = {
 }
 
 return config
-

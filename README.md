@@ -1,12 +1,12 @@
 # Dotfiles (WezTerm + Zsh)
-My personal terminal setup built around WezTerm, zsh, and Chez Moi. It installs a themed WezTerm (Catppuccin, JetBrainsMono Nerd Font, custom background) and an Oh My Zsh shell with Starship plus navigation/productivity plugins.
+My personal terminal setup built around WezTerm, zsh, and Chez Moi. It installs a themed WezTerm (Catppuccin, JetBrainsMono Nerd Font + Sarasa Mono SC + Noto Color Emoji, custom background) and an Oh My Zsh shell with Starship plus navigation/productivity plugins.
 
 I try to use the same operation method as vim in any way.
 
 ## Quick start (Chez Moi)
 - Install Chez Moi: `sh -c "$(curl -fsLS get.chezmoi.io/lb)" -- -b /usr/local/bin`
 - Apply everything: `chezmoi init --apply https://github.com/Immortal-Fates/dotfiles.git`
-  - The first apply runs `run_once_install-package-linux.sh`, which installs WezTerm, Oh My Zsh, Starship (pastel-powerline preset), zsh plugins (autojump, autosuggestions, syntax highlighting, vi-mode), JetBrainsMono Nerd Font, clipboard tools, and switches the default shell to zsh.
+- The first apply runs `run_once_install-package-linux.sh`, which installs WezTerm, Oh My Zsh, Starship (pastel-powerline preset), zsh plugins (autojump, autosuggestions, syntax highlighting, vi-mode), JetBrainsMono Nerd Font, clipboard tools, and switches the default shell to zsh.
 - Pull updates: `chezmoi update`
 - Edit tracked files: `chezmoi cd` then commit as usual.
 - Track new dotfiles: `chezmoi add ~/.<file>` followed by `chezmoi diff` to review.
@@ -16,6 +16,15 @@ I try to use the same operation method as vim in any way.
 - `private_dot_config/wezterm/wezterm.lua` — WezTerm appearance, keybinds, background.
 - `run_once_install-package-linux.sh` — first-apply installer for dependencies and fonts.
 - `assets/xuenai.png` — terminal background image.
+
+## Fonts I use
+- JetBrainsMono Nerd Font — main terminal + editor font (WezTerm + VS Code).
+  - Nerd Fonts repo: https://github.com/ryanoasis/nerd-fonts
+  - JetBrains Mono repo: https://github.com/JetBrains/JetBrainsMono
+- Sarasa Mono SC — CJK fallback for terminal.
+  - Sarasa Gothic repo: https://github.com/be5invis/Sarasa-Gothic
+- Noto Color Emoji — emoji fallback in WezTerm.
+  - Noto Emoji repo: https://github.com/googlefonts/noto-emoji
 
 ## Zsh setup
 - Takeaway: I use Oh My Zsh to manage my zsh plugins and starship as my topic.
@@ -27,13 +36,11 @@ I try to use the same operation method as vim in any way.
   - `zsh-autosuggestions` — ghost text suggestions from history; accept with → or `End`.
   - `zsh-syntax-highlighting` — colors for valid/invalid commands as you type.
 - Prompt: Starship with the pastel-powerline preset (patched Nerd Font). Minimal segments + powerline glyph separators; shows git state, dir, time, and clean exit indicator. Reload/init with `eval "$(starship init zsh)"`.
-- Aliases: `vim` -> `nvim`.
-- Conda: initialized if installed at `$HOME/miniconda3`.
 - Extra env: sourced from `~/.local/bin/env` for local secrets/paths.
 
 ## WezTerm setup
 - Takeaway: written in Rust and GPU accelerated so I like it.
-- Fonts/colors: JetBrainsMono Nerd Font + Noto Color Emoji, `Catppuccin Mocha`, 80% window opacity, custom background `assets/xuenai.png`.
+- Fonts/colors: JetBrainsMono Nerd Font + Sarasa Mono SC + Noto Color Emoji, `Catppuccin Mocha`, 80% window opacity, custom background `assets/xuenai.png`.
 - Defaults: launches login `zsh`, 120x32 window, small padding, resize-only decorations, no tab-close prompt.
 - Keybinds:
   - `Ctrl+Shift+t/w` new/close tab
