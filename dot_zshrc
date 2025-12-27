@@ -104,6 +104,8 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias vim='nvim'
+alias ff='fastfetch'
+alias c='codex --sandbox danger-full-access -m gpt-5.2-codex -c 'model_reasoning_summary_format=experimental' -c 'model_reasoning_effort=medium' --search'
 
 setopt HIST_IGNORE_SPACE
 eval "$(starship init zsh)"
