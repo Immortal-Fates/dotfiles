@@ -36,8 +36,8 @@ config.window_background_image_hsb = {
 }
 
 
--- No title bar but keep resize borders
-config.window_decorations = "RESIZE"
+-- No title bar or window controls
+config.window_decorations = "NONE"
 
 -- Highlight active pane using dimming (works on all versions)
 config.inactive_pane_hsb = {
@@ -49,10 +49,10 @@ config.inactive_pane_hsb = {
 -- Startup & Window Settings
 -- =============================================
 
-config.default_prog = { "/usr/bin/zsh", "-l" }
+config.default_prog = { "tmux", "new-session", "-A", "-s", "main" }
 
-config.initial_cols = 120
-config.initial_rows = 32
+config.initial_cols = 210
+config.initial_rows = 56
 
 config.window_padding = {
   left = 5,
@@ -61,7 +61,8 @@ config.window_padding = {
   bottom = 5,
 }
 
-config.hide_tab_bar_if_only_one_tab = false
+config.enable_tab_bar = false
+config.hide_tab_bar_if_only_one_tab = true
 config.window_close_confirmation = "NeverPrompt"
 
 -- =============================================
@@ -82,20 +83,19 @@ config.keys = {
     mods = "CTRL|SHIFT",
     action = wezterm.action.CloseCurrentTab({ confirm = false }),
   },
+  -- -- Horizontal split
+  -- {
+    -- key = "e",
+    -- mods = "CTRL|SHIFT",
+    -- action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
+  -- },
 
-  -- Horizontal split
-  {
-    key = "e",
-    mods = "CTRL|SHIFT",
-    action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
-  },
-
-  -- Vertical split
-  {
-    key = "o",
-    mods = "CTRL|SHIFT",
-    action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }),
-  },
+  -- -- Vertical split
+  -- {
+    -- key = "o",
+    -- mods = "CTRL|SHIFT",
+    -- action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }),
+  -- },
 
   -- Cycle panes
   {
@@ -104,11 +104,7 @@ config.keys = {
     action = wezterm.action.ActivatePaneDirection("Next"),
   },
 
-  -- Pane navigation
-  { key = "h", mods = "ALT", action = wezterm.action.ActivatePaneDirection("Left") },
-  { key = "l", mods = "ALT", action = wezterm.action.ActivatePaneDirection("Right") },
-  { key = "k", mods = "ALT", action = wezterm.action.ActivatePaneDirection("Up") },
-  { key = "j", mods = "ALT", action = wezterm.action.ActivatePaneDirection("Down") },
+  -- Pane navigation (handled by tmux; keep Alt+h/j/k/l free)
 }
 
 return config
