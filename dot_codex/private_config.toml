@@ -1,0 +1,48 @@
+tui = { theme = { name = "dark-zen-garden" }, spinner = { name = "brailleDotsClassic" }, alternate_screen = true, notifications = true }
+notify = ["/usr/bin/python3", "/home/immortal-pc1/.codex/notify.py"]
+model = "gpt-5.2-codex"
+model_verbosity = "medium"
+model_reasoning_effort = "medium"
+show_raw_agent_reasoning = true
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+exec_timeout_ms = 900000
+rmcp_client = true
+
+[projects."/home/immortal-pc1"]
+trust_level = "trusted"
+[projects."/home/immortal-pc1/ws/projects/Graduation-Project"]
+trust_level = "trusted"
+[projects."/home/immortal-pc1/ws/projects/embedding/docs"]
+trust_level = "trusted"
+[projects."/home/immortal-pc1/ws/docs/Notes-in-ZJU"]
+trust_level = "trusted"
+[projects."/home/immortal-pc1/ws/courses/math/optimal/Optimal-Control/TermProject"]
+trust_level = "trusted"
+[projects."/home/immortal-pc1/ws/courses/math/optimal/hw/TermProject"]
+trust_level = "trusted"
+[projects."/home/immortal-pc1/ws/projects/OpenSrc/.config"]
+trust_level = "trusted"
+
+[notice]
+hide_gpt5_1_migration_prompt = true
+hide_full_access_warning = true
+
+[notice.model_migrations]
+"gpt-5.1-codex" = "gpt-5.1-codex-max"
+"gpt-5.1-codex-max" = "gpt-5.2-codex"
+
+[features]
+web_search_request = true
+streamable_shell = true
+apply_patch_freeform = true
+unified_exec = false
+
+[mcp_servers.tracker]
+command = "/home/immortal-pc1/.config/agent-tracker/bin/tracker-mcp"
+startup_timeout_ms = 20000
+
+[mcp_servers.web]
+command = "/bin/sh"
+args = ["-lc", "exec mctrl-mcp web"]
+startup_timeout_ms = 20000
