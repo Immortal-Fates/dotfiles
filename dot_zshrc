@@ -109,6 +109,8 @@ alias c='codex --sandbox danger-full-access -m gpt-5.2-codex -c 'model_reasoning
 
 setopt HIST_IGNORE_SPACE
 eval "$(starship init zsh)"
+[ -f "$HOME/.config/zsh/tmux.zsh" ] && source "$HOME/.config/zsh/tmux.zsh"
+[ -f "$HOME/.config/zsh/co.zsh" ] && source "$HOME/.config/zsh/co.zsh"
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -131,4 +133,3 @@ unset __conda_setup
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
