@@ -1,3 +1,5 @@
 [user]
 	email = 1877114891@qq.com
 	name = Immortal-Fates
+[credential]
+	helper = store

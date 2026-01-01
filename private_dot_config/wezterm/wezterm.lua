@@ -104,6 +104,17 @@ config.keys = {
     action = wezterm.action.ActivatePaneDirection("Next"),
   },
 
+  -- Ctrl+Alt+1..9 -> send tmux prefix (C-b) then number
+  { key = "1", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "1") },
+  { key = "2", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "2") },
+  { key = "3", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "3") },
+  { key = "4", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "4") },
+  { key = "5", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "5") },
+  { key = "6", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "6") },
+  { key = "7", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "7") },
+  { key = "8", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "8") },
+  { key = "9", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "9") },
+
   -- Pane navigation (handled by tmux; keep Alt+h/j/k/l free)
 }
 
