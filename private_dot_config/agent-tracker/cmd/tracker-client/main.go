@@ -1535,9 +1535,10 @@ func runUI(args []string) error {
 
 		if helpVisible {
 			helpLines := []string{
-				"t: toggle Tracker/Notes | Tab: focus goals/notes | n/i: view scope | Alt-A: archive view",
+				"t: toggle Tracker/Notes | Tab: focus goals/notes | o: view scope | Alt-A: archive view",
 				"Goals: a add | Enter/c: complete | Shift-D: delete (focus goals first)",
-				"Notes: a add | k edit | Enter/c: complete | Shift-A: archive | Shift-D: delete | Shift-C: show/hide completed | Esc: close | ?: toggle help",
+				"Notes: a add | i edit | Enter/c: complete | Shift-A: archive | Shift-D: delete | Shift-C: show/hide completed | Esc: close | ?: toggle help",
+				"Nav: k up | j down",
 			}
 			row := 3
 			for _, line := range helpLines {
@@ -1836,14 +1837,9 @@ func runUI(args []string) error {
 						mode = viewTracker
 					}
 					draw(time.Now())
-				case 'n':
+				case 'o':
 					if mode == viewNotes {
-						cycleScope(false, false)
-						draw(time.Now())
-					}
-				case 'i':
-					if mode == viewNotes {
-						cycleScope(true, false)
+						cycleScope(true, true)
 						draw(time.Now())
 					}
 				case 's':
@@ -1856,7 +1852,7 @@ func runUI(args []string) error {
 						}
 						draw(time.Now())
 					}
-				case 'u':
+				case 'k':
 					switch mode {
 					case viewTracker:
 						if taskList.selected > 0 {
@@ -1878,7 +1874,7 @@ func runUI(args []string) error {
 						}
 					}
 					draw(time.Now())
-				case 'e':
+				case 'j':
 					switch mode {
 					case viewTracker:
 						tasks := getVisibleTasks()
@@ -1991,7 +1987,7 @@ func runUI(args []string) error {
 						}
 						draw(time.Now())
 					}
-				case 'k':
+				case 'i':
 					if mode == viewNotes {
 						notes := getVisibleNotes()
 						if len(notes) > 0 && noteList.selected < len(notes) {
