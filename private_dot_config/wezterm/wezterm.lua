@@ -23,7 +23,7 @@ config.font_size = 14.0
 
 config.color_scheme = "Catppuccin Mocha"
 
-config.window_background_opacity = 0.8
+config.window_background_opacity = 0.9
 config.text_background_opacity = 1.0
 
 config.default_cursor_style = "BlinkingBar"
@@ -65,6 +65,10 @@ config.enable_tab_bar = false
 config.hide_tab_bar_if_only_one_tab = true
 config.window_close_confirmation = "NeverPrompt"
 
+-- Enable extended key encodings so tmux can distinguish Ctrl+Alt combos.
+config.enable_csi_u_key_encoding = true
+config.enable_kitty_keyboard = true
+
 -- =============================================
 -- Key Bindings
 -- =============================================
@@ -104,16 +108,16 @@ config.keys = {
     action = wezterm.action.ActivatePaneDirection("Next"),
   },
 
-  -- Ctrl+Alt+1..9 -> send tmux prefix (C-b) then number
-  { key = "1", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "1") },
-  { key = "2", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "2") },
-  { key = "3", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "3") },
-  { key = "4", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "4") },
-  { key = "5", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "5") },
-  { key = "6", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "6") },
-  { key = "7", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "7") },
-  { key = "8", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "8") },
-  { key = "9", mods = "CTRL|ALT", action = wezterm.action.SendString("\x02" .. "9") },
+  -- Ctrl+Alt+1..9 -> send tmux prefix (C-a) then number
+  { key = "1", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "1") },
+  { key = "2", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "2") },
+  { key = "3", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "3") },
+  { key = "4", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "4") },
+  { key = "5", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "5") },
+  { key = "6", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "6") },
+  { key = "7", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "7") },
+  { key = "8", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "8") },
+  { key = "9", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "9") },
 
   -- Pane navigation (handled by tmux; keep Alt+h/j/k/l free)
 }

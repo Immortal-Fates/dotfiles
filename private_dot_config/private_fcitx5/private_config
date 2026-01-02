@@ -43,7 +43,6 @@ EnumerateSkipFirst=False
 0=Tab
 
 [Hotkey/TogglePreedit]
-0=Control+Alt+P
 
 [Behavior]
 # Active By Default
