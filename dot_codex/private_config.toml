@@ -51,3 +51,7 @@ startup_timeout_sec = 20.0
 command = "npx"
 args = ["-y", "@upstash/context7-mcp"]
 startup_timeout_sec = 20.0
+
+[mcp_servers.drawio]
+command = "npx"
+args = ["@next-ai-drawio/mcp-server@latest"]
