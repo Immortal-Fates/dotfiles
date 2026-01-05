@@ -7,9 +7,6 @@ return {
     "MunifTanjim/nui.nvim",
   },
   cmd = "Neotree",
-  keys = {
-    { "<leader>e", ":Neotree toggle<CR>", desc = "Toggle Neo-tree" },
-  },
   config = function()
     require("neo-tree").setup({
       close_if_last_window = true,
@@ -39,4 +36,3 @@ return {
     })
   end,
 }
-

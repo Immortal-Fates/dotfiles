@@ -18,7 +18,7 @@ return {
     build = "cd app && npm install",
     config = function()
       vim.g.mkdp_auto_start = 0
-      vim.g.mkdp_browser = "chrome"
+      vim.g.mkdp_browser = "microsoft-edge"
     end,
   },
 
