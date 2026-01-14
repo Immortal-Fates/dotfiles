@@ -1,5 +1,7 @@
 -- Base editor options
 vim.opt.termguicolors = true
+vim.opt.number = true
+vim.opt.relativenumber = true
 
 -- GUI transparency (neovide)
 do

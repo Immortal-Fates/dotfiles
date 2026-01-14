@@ -17,5 +17,6 @@ source $ZSH/oh-my-zsh.sh
 
 setopt HIST_IGNORE_SPACE
 eval "$(starship init zsh)"
+eval "$(codex completion zsh)"
 
 . "$HOME/.local/bin/env"
