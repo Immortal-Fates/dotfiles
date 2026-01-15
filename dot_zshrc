@@ -1,8 +1,6 @@
 # OPENSPEC:START
 # OpenSpec shell completions configuration
 fpath=("/home/immortal-pc1/.oh-my-zsh/custom/completions" $fpath)
-autoload -Uz compinit
-compinit
 # OPENSPEC:END
 
 [ -f "$HOME/.config/zsh/env.zsh" ] && source "$HOME/.config/zsh/env.zsh"
@@ -10,13 +8,13 @@ compinit
 [ -f "$HOME/.config/zsh/tmux.zsh" ] && source "$HOME/.config/zsh/tmux.zsh"
 [ -f "$HOME/.config/zsh/functions/co.zsh" ] && source "$HOME/.config/zsh/functions/co.zsh"
 
-# plugin sudo confilct with zsh-vi-mode
 plugins=(git autojump copypath zsh-vi-mode zsh-autosuggestions zsh-syntax-highlighting)
-
 source $ZSH/oh-my-zsh.sh
 
 setopt HIST_IGNORE_SPACE
 eval "$(starship init zsh)"
-eval "$(codex completion zsh)"
+if command -v codex >/dev/null 2>&1; then
+  eval "$(codex completion zsh)"
+fi
 
 . "$HOME/.local/bin/env"

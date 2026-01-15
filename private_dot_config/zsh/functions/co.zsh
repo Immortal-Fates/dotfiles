@@ -1,4 +1,5 @@
 co() {
+  ensure_tracker_sock || print -u2 "co: warning: tracker socket missing at /run/user/1000/agent-tracker.sock"
   local -a codex_cmd
   codex_cmd=(codex)
   local search_dir=$PWD
@@ -167,4 +168,19 @@ co() {
   trap - EXIT INT TERM
   eval "$cleanup_cmd"
   return $exit_code
+}
+
+ensure_tracker_sock() {
+  local sock="/run/user/1000/agent-tracker.sock"
+  local link="/tmp/agent-tracker.sock"
+
+  if [ ! -S "$sock" ]; then
+    return 1
+  fi
+
+  if [ ! -L "$link" ] || [ "$(readlink "$link")" != "$sock" ]; then
+    ln -sf "$sock" "$link" || return 1
+  fi
+
+  return 0
 }

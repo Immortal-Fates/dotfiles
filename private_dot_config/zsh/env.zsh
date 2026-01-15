@@ -3,21 +3,26 @@ export ZSH="$HOME/.oh-my-zsh"
 
 export CODEX_TRACKER_SOCKET="/run/user/1000/agent-tracker.sock"
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/immortal-pc1/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
+conda() {
+    unset -f conda
     if [ -f "/home/immortal-pc1/miniconda3/etc/profile.d/conda.sh" ]; then
         . "/home/immortal-pc1/miniconda3/etc/profile.d/conda.sh"
     else
         export PATH="/home/immortal-pc1/miniconda3/bin:$PATH"
     fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
+    conda "$@"
+}
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+nvm() {
+    unset -f nvm
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    nvm "$@"
+}
+
+export ZSH_DISABLE_COMPFIX=true
+export ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
+mkdir -p "${ZSH_COMPDUMP:h}"
+autoload -Uz compinit
+compinit -C -d "$ZSH_COMPDUMP"
+compinit() { :; }
