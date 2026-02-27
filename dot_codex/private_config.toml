@@ -1,4 +1,9 @@
-tui = { theme = { name = "dark-zen-garden" }, spinner = { name = "brailleDotsClassic" }, alternate_screen = true, notifications = true }
+[tui]
+theme = "dark-zen-garden"
+spinner = "brailleDotsClassic"
+alternate_screen = "auto"
+notifications = true
+
 notify = ["/usr/bin/python3", "/home/immortal-pc1/.codex/notify.py"]
 model = "gpt-5.2-codex"
 model_verbosity = "medium"
@@ -8,6 +13,7 @@ approval_policy = "never"
 sandbox_mode = "danger-full-access"
 exec_timeout_ms = 900000
 rmcp_client = true
+personality = "pragmatic"
 
 [projects."/home/immortal-pc1"]
 trust_level = "trusted"
