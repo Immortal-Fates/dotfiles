@@ -60,6 +60,7 @@ hide_full_access_warning = true
 "gpt-5.1-codex-max" = "gpt-5.2-codex"
 
 [features]
+codex_hooks = true
 streamable_shell = true
 apply_patch_freeform = true
 unified_exec = false
