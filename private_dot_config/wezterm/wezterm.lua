@@ -23,7 +23,7 @@ config.font_size = 14.0
 
 config.color_scheme = "Catppuccin Mocha"
 
-config.window_background_opacity = 0.9
+config.window_background_opacity = 1.0
 config.text_background_opacity = 1.0
 
 config.default_cursor_style = "BlinkingBar"
