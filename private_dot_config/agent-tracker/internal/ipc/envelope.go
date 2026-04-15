@@ -1,28 +1,36 @@
 package ipc
 
 type Envelope struct {
-	Kind      string `json:"kind"`
-	Command   string `json:"command,omitempty"`
-	Client    string `json:"client,omitempty"`
-	Session   string `json:"session,omitempty"`
-	SessionID string `json:"session_id,omitempty"`
-	Window    string `json:"window,omitempty"`
-	WindowID  string `json:"window_id,omitempty"`
-	Pane      string `json:"pane,omitempty"`
-	Scope     string `json:"scope,omitempty"`
-	NoteID    string `json:"note_id,omitempty"`
-	GoalID    string `json:"goal_id,omitempty"`
-	Position  string `json:"position,omitempty"`
-	Visible   *bool  `json:"visible,omitempty"`
-	Message   string `json:"message,omitempty"`
-	Summary   string `json:"summary,omitempty"`
-	Tasks     []Task `json:"tasks,omitempty"`
-	Notes     []Note `json:"notes,omitempty"`
-	Archived  []Note `json:"archived,omitempty"`
-	Goals     []Goal `json:"goals,omitempty"`
+	Kind         string `json:"kind"`
+	Command      string `json:"command,omitempty"`
+	Client       string `json:"client,omitempty"`
+	Source       string `json:"source,omitempty"`
+	TaskID       string `json:"task_id,omitempty"`
+	ParentTaskID string `json:"parent_task_id,omitempty"`
+	Session      string `json:"session,omitempty"`
+	SessionID    string `json:"session_id,omitempty"`
+	Window       string `json:"window,omitempty"`
+	WindowID     string `json:"window_id,omitempty"`
+	Pane         string `json:"pane,omitempty"`
+	Scope        string `json:"scope,omitempty"`
+	NoteID       string `json:"note_id,omitempty"`
+	GoalID       string `json:"goal_id,omitempty"`
+	Position     string `json:"position,omitempty"`
+	Visible      *bool  `json:"visible,omitempty"`
+	Message      string `json:"message,omitempty"`
+	Summary      string `json:"summary,omitempty"`
+	Tasks        []Task `json:"tasks,omitempty"`
+	Notes        []Note `json:"notes,omitempty"`
+	Archived     []Note `json:"archived,omitempty"`
+	Goals        []Goal `json:"goals,omitempty"`
 }
 
 type Task struct {
+	Source          string  `json:"source,omitempty"`
+	TaskID          string  `json:"task_id,omitempty"`
+	ParentTaskID    string  `json:"parent_task_id,omitempty"`
+	IsSubagent      bool    `json:"is_subagent,omitempty"`
+	ChildCount      int     `json:"child_count,omitempty"`
 	SessionID       string  `json:"session_id"`
 	Session         string  `json:"session"`
 	WindowID        string  `json:"window_id"`

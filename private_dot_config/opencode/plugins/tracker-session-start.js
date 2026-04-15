@@ -1,15 +1,18 @@
 const TRACKER_START_SCRIPT = "/home/immortal-pc1/.config/agent-tracker/scripts/auto_start_session.py";
 
-async function startTrackerSession(sessionID, cwd) {
+async function startTrackerSession(session) {
   const proc = Bun.spawn([
     "/usr/bin/python3",
     TRACKER_START_SCRIPT,
     "--source",
     "opencode",
     "--session-id",
-    sessionID,
+    session.id,
     "--cwd",
-    cwd || "",
+    session.directory || "",
+    "--task-id",
+    session.id,
+    ...(session.parentID ? ["--parent-task-id", session.parentID] : []),
   ], {
     stdin: "ignore",
     stdout: "ignore",
@@ -31,7 +34,7 @@ export const TrackerSessionStartPlugin = async () => {
         return;
       }
       seenSessions.add(session.id);
-      await startTrackerSession(session.id, session.directory || "");
+      await startTrackerSession(session);
     },
   };
 };

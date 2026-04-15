@@ -102,8 +102,11 @@ func main() {
 
 func runCommand(args []string) error {
 	fs := flag.NewFlagSet("tracker-client command", flag.ExitOnError)
-	var client, session, sessionID, window, windowID, pane, summary, scope, noteID string
+	var client, source, taskID, parentTaskID, session, sessionID, window, windowID, pane, summary, scope, noteID string
 	fs.StringVar(&client, "client", "", "tmux client tty")
+	fs.StringVar(&source, "source", "", "task source")
+	fs.StringVar(&taskID, "task-id", "", "stable task identifier")
+	fs.StringVar(&parentTaskID, "parent-task-id", "", "parent task identifier")
 	fs.StringVar(&session, "session", "", "tmux session name")
 	fs.StringVar(&sessionID, "session-id", "", "tmux session id")
 	fs.StringVar(&window, "window", "", "tmux window name")
@@ -124,24 +127,27 @@ func runCommand(args []string) error {
 	}
 
 	env := ipc.Envelope{
-		Kind:      "command",
-		Command:   rest[0],
-		Client:    client,
-		Session:   strings.TrimSpace(session),
-		SessionID: strings.TrimSpace(sessionID),
-		Window:    strings.TrimSpace(window),
-		WindowID:  strings.TrimSpace(windowID),
-		Pane:      strings.TrimSpace(pane),
-		Scope:     strings.TrimSpace(scope),
-		NoteID:    strings.TrimSpace(noteID),
-		Summary:   strings.TrimSpace(summary),
+		Kind:         "command",
+		Command:      rest[0],
+		Client:       client,
+		Source:       strings.TrimSpace(source),
+		TaskID:       strings.TrimSpace(taskID),
+		ParentTaskID: strings.TrimSpace(parentTaskID),
+		Session:      strings.TrimSpace(session),
+		SessionID:    strings.TrimSpace(sessionID),
+		Window:       strings.TrimSpace(window),
+		WindowID:     strings.TrimSpace(windowID),
+		Pane:         strings.TrimSpace(pane),
+		Scope:        strings.TrimSpace(scope),
+		NoteID:       strings.TrimSpace(noteID),
+		Summary:      strings.TrimSpace(summary),
 	}
 	if env.Summary != "" {
 		env.Message = env.Summary
 	}
 
 	switch env.Command {
-	case "start_task", "finish_task", "acknowledge", "note_add", "note_archive_pane", "note_attach":
+	case "start_task", "finish_task", "acknowledge", "delete_task", "note_add", "note_archive_pane", "note_attach":
 		ctx, err := resolveContext(env.Session, env.SessionID, env.Window, env.WindowID, env.Pane)
 		if err != nil {
 			return err
@@ -466,6 +472,7 @@ func runUI(args []string) error {
 	archiveList := listState{}
 	goalList := listState{}
 	keepTasksVisible := make(map[string]bool)
+	collapsedTasks := make(map[string]bool)
 	keepNotesVisible := make(map[string]bool)
 	prompt := promptState{}
 	helpVisible := false
@@ -630,18 +637,16 @@ func runUI(args []string) error {
 		return utf8.RuneCountInString(s)
 	}
 
-	getVisibleTasks := func() []ipc.Task {
-
+	getVisibleTaskRows := func() []taskRow {
 		result := make([]ipc.Task, 0, len(st.tasks))
 		for _, t := range st.tasks {
-			key := fmt.Sprintf("%s|%s|%s", strings.TrimSpace(t.SessionID), strings.TrimSpace(t.WindowID), strings.TrimSpace(t.Pane))
+			key := taskVisibilityKey(t)
 			if !showCompletedTasks && t.Status == statusCompleted && !keepTasksVisible[key] {
 				continue
 			}
 			result = append(result, t)
 		}
-		sortTasks(result)
-		return result
+		return buildVisibleTaskRows(result, collapsedTasks)
 	}
 
 	getVisibleNotes := func() []ipc.Note {
@@ -826,10 +831,12 @@ func runUI(args []string) error {
 	}
 
 	toggleTask := func(t ipc.Task) error {
-		key := fmt.Sprintf("%s|%s|%s", strings.TrimSpace(t.SessionID), strings.TrimSpace(t.WindowID), strings.TrimSpace(t.Pane))
+		key := taskVisibilityKey(t)
 		keepTasksVisible[key] = true
 		if t.Status == statusInProgress {
 			return sendCommand("finish_task", func(env *ipc.Envelope) {
+				env.Source = t.Source
+				env.TaskID = t.TaskID
 				env.Session = t.Session
 				env.SessionID = t.SessionID
 				env.Window = t.Window
@@ -838,6 +845,8 @@ func runUI(args []string) error {
 			})
 		}
 		return sendCommand("acknowledge", func(env *ipc.Envelope) {
+			env.Source = t.Source
+			env.TaskID = t.TaskID
 			env.Session = t.Session
 			env.SessionID = t.SessionID
 			env.Window = t.Window
@@ -848,6 +857,8 @@ func runUI(args []string) error {
 
 	deleteTask := func(t ipc.Task) error {
 		return sendCommand("delete_task", func(env *ipc.Envelope) {
+			env.Source = t.Source
+			env.TaskID = t.TaskID
 			env.Session = t.Session
 			env.SessionID = t.SessionID
 			env.Window = t.Window
@@ -1002,19 +1013,31 @@ func runUI(args []string) error {
 			visibleRows = 0
 		}
 
-		renderTasks := func(list []ipc.Task, state *listState) {
+		renderTasks := func(list []taskRow, state *listState) {
 			clampList(state, len(list), 3, visibleRows)
 			row := 3
 			for idx := state.offset; idx < len(list); idx++ {
 				if row >= height {
 					break
 				}
-				t := list[idx]
+				item := list[idx]
+				t := item.Task
 				indicator := taskIndicator(t, now)
 				summary := t.Summary
 				if summary == "" {
 					summary = "(no summary)"
 				}
+				indent := strings.Repeat("  ", item.Depth)
+				if item.VisibleChildCount > 0 {
+					marker := "▾ "
+					if collapsedTasks[strings.TrimSpace(t.TaskID)] {
+						marker = "▸ "
+					}
+					summary = marker + summary
+				} else if t.IsSubagent {
+					summary = "↳ " + summary
+				}
+				summary = indent + summary
 
 				// Style definitions
 				baseStyle := tcell.StyleDefault
@@ -1082,7 +1105,7 @@ func runUI(args []string) error {
 				}
 
 				// Line 2: Meta info (Session / Window)
-				meta := fmt.Sprintf("   └ %s / %s", t.Session, t.Window)
+				meta := fmt.Sprintf("%s└ [%s] %s / %s", indent+"   ", taskSourceLabel(t.Source), t.Session, t.Window)
 				if t.Status == statusCompleted && !t.Acknowledged {
 					meta += " (awaiting review)"
 				}
@@ -1091,7 +1114,7 @@ func runUI(args []string) error {
 				row++
 
 				if t.CompletionNote != "" && row < height {
-					note := fmt.Sprintf("     Note: %s", t.CompletionNote)
+					note := fmt.Sprintf("%s  Note: %s", indent+"   ", t.CompletionNote)
 					noteStyle := tcell.StyleDefault.Foreground(tcell.ColorLightSteelBlue)
 					if idx == state.selected {
 						noteStyle = noteStyle.Background(tcell.ColorDarkSlateGray)
@@ -1538,6 +1561,7 @@ func runUI(args []string) error {
 				"t: toggle Tracker/Notes | Tab: focus goals/notes | o: view scope | Alt-A: archive view",
 				"Goals: a add | Enter/c: complete | Shift-D: delete (focus goals first)",
 				"Notes: a add | i edit | Enter/c: complete | Shift-A: archive | Shift-D: delete | Shift-C: show/hide completed | Esc: close | ?: toggle help",
+				"Tracker: x expand/collapse subtree | c finish/ack | p/Enter focus | Shift-D delete",
 				"Nav: k up | j down",
 			}
 			row := 3
@@ -1554,7 +1578,7 @@ func runUI(args []string) error {
 
 		switch mode {
 		case viewTracker:
-			list := getVisibleTasks()
+			list := getVisibleTaskRows()
 			if len(list) == 0 && height > 3 {
 				writeStyledLine(screen, 0, 3, truncate("No tasks.", width), infoStyle)
 			} else {
@@ -1775,9 +1799,9 @@ func runUI(args []string) error {
 				if tev.Key() == tcell.KeyEnter {
 					switch mode {
 					case viewTracker:
-						tasks := getVisibleTasks()
-						if len(tasks) > 0 && taskList.selected < len(tasks) {
-							if err := focusTask(tasks[taskList.selected]); err != nil {
+						rows := getVisibleTaskRows()
+						if len(rows) > 0 && taskList.selected < len(rows) {
+							if err := focusTask(rows[taskList.selected].Task); err != nil {
 								st.message = err.Error()
 							}
 						}
@@ -1877,8 +1901,8 @@ func runUI(args []string) error {
 				case 'j':
 					switch mode {
 					case viewTracker:
-						tasks := getVisibleTasks()
-						if taskList.selected < len(tasks)-1 {
+						rows := getVisibleTaskRows()
+						if taskList.selected < len(rows)-1 {
 							taskList.selected++
 						}
 					case viewNotes:
@@ -1913,9 +1937,9 @@ func runUI(args []string) error {
 					}
 					switch mode {
 					case viewTracker:
-						tasks := getVisibleTasks()
-						if len(tasks) > 0 && taskList.selected < len(tasks) {
-							if err := toggleTask(tasks[taskList.selected]); err != nil {
+						rows := getVisibleTaskRows()
+						if len(rows) > 0 && taskList.selected < len(rows) {
+							if err := toggleTask(rows[taskList.selected].Task); err != nil {
 								st.message = err.Error()
 							}
 						}
@@ -1946,9 +1970,9 @@ func runUI(args []string) error {
 					draw(time.Now())
 				case 'p':
 					if mode == viewTracker {
-						tasks := getVisibleTasks()
-						if len(tasks) > 0 && taskList.selected < len(tasks) {
-							if err := focusTask(tasks[taskList.selected]); err != nil {
+						rows := getVisibleTaskRows()
+						if len(rows) > 0 && taskList.selected < len(rows) {
+							if err := focusTask(rows[taskList.selected].Task); err != nil {
 								st.message = err.Error()
 							}
 						}
@@ -1995,14 +2019,26 @@ func runUI(args []string) error {
 						}
 						draw(time.Now())
 					}
+				case 'x':
+					if mode == viewTracker {
+						rows := getVisibleTaskRows()
+						if len(rows) > 0 && taskList.selected < len(rows) {
+							selected := rows[taskList.selected].Task
+							if rows[taskList.selected].VisibleChildCount > 0 {
+								key := strings.TrimSpace(selected.TaskID)
+								collapsedTasks[key] = !collapsedTasks[key]
+							}
+						}
+						draw(time.Now())
+					}
 
 				case 'd':
 					if shift {
 						switch mode {
 						case viewTracker:
-							tasks := getVisibleTasks()
-							if len(tasks) > 0 && taskList.selected < len(tasks) {
-								if err := deleteTask(tasks[taskList.selected]); err != nil {
+							rows := getVisibleTaskRows()
+							if len(rows) > 0 && taskList.selected < len(rows) {
+								if err := deleteTask(rows[taskList.selected].Task); err != nil {
 									st.message = err.Error()
 								}
 							}
@@ -2045,6 +2081,26 @@ func runUI(args []string) error {
 			return err
 		}
 	}
+}
+
+func taskVisibilityKey(t ipc.Task) string {
+	if strings.TrimSpace(t.TaskID) != "" {
+		return strings.TrimSpace(t.TaskID)
+	}
+	return strings.Join([]string{
+		strings.TrimSpace(t.Source),
+		strings.TrimSpace(t.SessionID),
+		strings.TrimSpace(t.WindowID),
+		strings.TrimSpace(t.Pane),
+	}, "|")
+}
+
+func taskSourceLabel(source string) string {
+	source = strings.TrimSpace(source)
+	if source == "" {
+		return "unknown"
+	}
+	return source
 }
 
 func sortTasks(tasks []ipc.Task) {

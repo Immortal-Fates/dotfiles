@@ -14,6 +14,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--session-id", default="")
     parser.add_argument("--cwd", default="")
     parser.add_argument("--summary", default="")
+    parser.add_argument("--task-id", default="")
+    parser.add_argument("--parent-task-id", default="")
     parser.add_argument("--from-codex-hook", action="store_true")
     return parser.parse_args()
 
@@ -73,6 +75,10 @@ def main() -> int:
         "command",
         "--source",
         args.source.strip(),
+        "--task-id",
+        args.task_id.strip(),
+        "--parent-task-id",
+        args.parent_task_id.strip(),
         "--summary",
         summary,
         "start_task",

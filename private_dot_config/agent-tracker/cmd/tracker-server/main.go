@@ -44,6 +44,9 @@ const (
 )
 
 type taskRecord struct {
+	TaskID         string
+	ParentTaskID   string
+	Source         string
 	SessionID      string
 	WindowID       string
 	Pane           string
@@ -53,6 +56,13 @@ type taskRecord struct {
 	CompletedAt    *time.Time
 	Status         string
 	Acknowledged   bool
+}
+
+type startTaskOptions struct {
+	Summary      string
+	Source       string
+	TaskID       string
+	ParentTaskID string
 }
 
 type noteRecord struct {
@@ -275,7 +285,12 @@ func (s *server) handleCommand(env ipc.Envelope) error {
 		if summary == "" {
 			return fmt.Errorf("start_task requires summary")
 		}
-		if err := s.startTask(target, summary); err != nil {
+		if err := s.startTask(target, startTaskOptions{
+			Summary:      summary,
+			Source:       env.Source,
+			TaskID:       env.TaskID,
+			ParentTaskID: env.ParentTaskID,
+		}); err != nil {
 			return err
 		}
 		s.broadcastStateAsync()
@@ -287,7 +302,7 @@ func (s *server) handleCommand(env ipc.Envelope) error {
 			return err
 		}
 		note := firstNonEmpty(env.Summary, env.Message)
-		if err := s.finishTask(target, note); err != nil {
+		if err := s.finishTask(env.TaskID, target, note, env.Source); err != nil {
 			return err
 		}
 		// s.notifyResponded(target)
@@ -299,7 +314,7 @@ func (s *server) handleCommand(env ipc.Envelope) error {
 		if err != nil {
 			return err
 		}
-		if err := s.acknowledgeTask(target.SessionID, target.WindowID, target.PaneID); err != nil {
+		if err := s.acknowledgeTask(env.TaskID, env.Source, target.SessionID, target.WindowID, target.PaneID); err != nil {
 			return err
 		}
 		s.broadcastStateAsync()
@@ -310,7 +325,7 @@ func (s *server) handleCommand(env ipc.Envelope) error {
 		if err != nil {
 			return err
 		}
-		if err := s.deleteTask(target.SessionID, target.WindowID, target.PaneID); err != nil {
+		if err := s.deleteTask(env.TaskID, env.Source, target.SessionID, target.WindowID, target.PaneID); err != nil {
 			return err
 		}
 		s.broadcastStateAsync()
@@ -424,15 +439,22 @@ func (s *server) handleCommand(env ipc.Envelope) error {
 	}
 }
 
-func (s *server) startTask(target tmuxTarget, summary string) error {
+func (s *server) startTask(target tmuxTarget, opts startTaskOptions) error {
 	now := time.Now()
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.tasks[taskKey(target.SessionID, target.WindowID, target.PaneID)] = &taskRecord{
+	taskID := strings.TrimSpace(opts.TaskID)
+	if taskID == "" {
+		taskID = taskKey(opts.Source, target.SessionID, target.WindowID, target.PaneID)
+	}
+	s.tasks[taskID] = &taskRecord{
+		TaskID:       taskID,
+		ParentTaskID: strings.TrimSpace(opts.ParentTaskID),
+		Source:       normalizeSource(opts.Source),
 		SessionID:    target.SessionID,
 		WindowID:     target.WindowID,
 		Pane:         target.PaneID,
-		Summary:      summary,
+		Summary:      opts.Summary,
 		StartedAt:    now,
 		Status:       statusInProgress,
 		Acknowledged: true,
@@ -440,15 +462,28 @@ func (s *server) startTask(target tmuxTarget, summary string) error {
 	return nil
 }
 
-func (s *server) finishTask(target tmuxTarget, note string) error {
+func (s *server) finishTask(taskID string, target tmuxTarget, note, source string) error {
 	now := time.Now()
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	key := taskKey(target.SessionID, target.WindowID, target.PaneID)
-	t, ok := s.tasks[key]
+	key, t, ok, ambiguous := s.lookupTaskLocked(taskID, source, target.SessionID, target.WindowID, target.PaneID)
+	if ambiguous {
+		return fmt.Errorf("multiple tasks match pane; source required")
+	}
 	if !ok {
-		t = &taskRecord{SessionID: target.SessionID, WindowID: target.WindowID, Pane: target.PaneID, StartedAt: now}
+		resolvedID := strings.TrimSpace(taskID)
+		if resolvedID == "" {
+			resolvedID = taskKey(source, target.SessionID, target.WindowID, target.PaneID)
+		}
+		t = &taskRecord{TaskID: resolvedID, Source: normalizeSource(source), SessionID: target.SessionID, WindowID: target.WindowID, Pane: target.PaneID, StartedAt: now}
+		key = resolvedID
 		s.tasks[key] = t
+	}
+	if t.TaskID == "" {
+		t.TaskID = key
+	}
+	if t.Source == "" {
+		t.Source = normalizeSource(source)
 	}
 	if t.Summary == "" {
 		t.Summary = note
@@ -462,20 +497,66 @@ func (s *server) finishTask(target tmuxTarget, note string) error {
 	return nil
 }
 
-func (s *server) acknowledgeTask(sessionID, windowID, paneID string) error {
+func (s *server) acknowledgeTask(taskID, source, sessionID, windowID, paneID string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if t, ok := s.tasks[taskKey(sessionID, windowID, paneID)]; ok {
+	_, t, ok, ambiguous := s.lookupTaskLocked(taskID, source, sessionID, windowID, paneID)
+	if ambiguous {
+		return fmt.Errorf("multiple tasks match pane; source required")
+	}
+	if ok {
 		t.Acknowledged = true
 	}
 	return nil
 }
 
-func (s *server) deleteTask(sessionID, windowID, paneID string) error {
+func (s *server) deleteTask(taskID, source, sessionID, windowID, paneID string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	delete(s.tasks, taskKey(sessionID, windowID, paneID))
+	key, _, ok, ambiguous := s.lookupTaskLocked(taskID, source, sessionID, windowID, paneID)
+	if ambiguous {
+		return fmt.Errorf("multiple tasks match pane; source required")
+	}
+	if ok {
+		delete(s.tasks, key)
+	}
 	return nil
+}
+
+func (s *server) lookupTaskLocked(taskID, source, sessionID, windowID, paneID string) (string, *taskRecord, bool, bool) {
+	trimmedTaskID := strings.TrimSpace(taskID)
+	if trimmedTaskID != "" {
+		t, ok := s.tasks[trimmedTaskID]
+		return trimmedTaskID, t, ok, false
+	}
+
+	normalized := normalizeSource(source)
+
+	var (
+		matchedKey string
+		matched    *taskRecord
+		count      int
+	)
+	for key, task := range s.tasks {
+		if normalized != "unknown" && strings.TrimSpace(task.Source) != normalized {
+			continue
+		}
+		if strings.TrimSpace(task.SessionID) != strings.TrimSpace(sessionID) ||
+			strings.TrimSpace(task.WindowID) != strings.TrimSpace(windowID) ||
+			strings.TrimSpace(task.Pane) != strings.TrimSpace(paneID) {
+			continue
+		}
+		matchedKey = key
+		matched = task
+		count++
+		if count > 1 {
+			return "", nil, false, true
+		}
+	}
+	if count == 1 {
+		return matchedKey, matched, true, false
+	}
+	return taskKey(source, sessionID, windowID, paneID), nil, false, false
 }
 
 func normalizeScope(scope string) string {
@@ -862,7 +943,12 @@ func (s *server) notifyResponded(target tmuxTarget) {
 func (s *server) summaryForTask(sessionID, windowID, paneID string) string {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if t, ok := s.tasks[taskKey(sessionID, windowID, paneID)]; ok {
+	for _, t := range s.tasks {
+		if strings.TrimSpace(t.SessionID) != strings.TrimSpace(sessionID) ||
+			strings.TrimSpace(t.WindowID) != strings.TrimSpace(windowID) ||
+			strings.TrimSpace(t.Pane) != strings.TrimSpace(paneID) {
+			continue
+		}
 		if note := strings.TrimSpace(t.CompletionNote); note != "" {
 			return note
 		}
@@ -1226,6 +1312,13 @@ func (s *server) buildStateEnvelope() *ipc.Envelope {
 	now := time.Now()
 	tasks := make([]ipc.Task, 0, len(copies))
 	nameCache := make(map[string][2]string)
+	childCounts := make(map[string]int)
+	for _, t := range copies {
+		parentID := strings.TrimSpace(t.ParentTaskID)
+		if parentID != "" {
+			childCounts[parentID]++
+		}
+	}
 	for _, t := range copies {
 		started := ""
 		if !t.StartedAt.IsZero() {
@@ -1256,6 +1349,11 @@ func (s *server) buildStateEnvelope() *ipc.Envelope {
 		}
 
 		tasks = append(tasks, ipc.Task{
+			Source:          t.Source,
+			TaskID:          t.TaskID,
+			ParentTaskID:    t.ParentTaskID,
+			IsSubagent:      strings.TrimSpace(t.ParentTaskID) != "",
+			ChildCount:      childCounts[strings.TrimSpace(t.TaskID)],
 			SessionID:       t.SessionID,
 			Session:         names[0],
 			WindowID:        t.WindowID,
@@ -1490,8 +1588,22 @@ func goalsStorePath() string {
 	return filepath.Join(base, "goals.json")
 }
 
-func taskKey(sessionID, windowID, paneID string) string {
-	return strings.Join([]string{sessionID, windowID, paneID}, "|")
+func taskKey(source, sessionID, windowID, paneID string) string {
+	return strings.Join([]string{normalizeSource(source), sessionID, windowID, paneID}, "|")
+}
+
+func normalizeSource(source string) string {
+	source = strings.TrimSpace(strings.ToLower(source))
+	if source == "" || source == "unknown" {
+		return "unknown"
+	}
+	switch {
+	case strings.Contains(source, "opencode"):
+		return "opencode"
+	case strings.Contains(source, "codex"):
+		return "codex"
+	}
+	return source
 }
 
 func requireSessionWindow(env ipc.Envelope) (tmuxTarget, error) {
@@ -1630,15 +1742,26 @@ func firstNonEmpty(values ...string) string {
 }
 
 func stateSummary(tasks []ipc.Task, notes []ipc.Note, archived []ipc.Note) string {
-	inProgress := 0
+	activeTasks := 0
 	waiting := 0
+	activeSessions := make(map[string]struct{})
 	for _, t := range tasks {
+		sessionID := strings.TrimSpace(t.SessionID)
+		isRoot := strings.TrimSpace(t.ParentTaskID) == ""
 		switch t.Status {
 		case statusInProgress:
-			inProgress++
+			if isRoot {
+				activeTasks++
+			}
+			if sessionID != "" {
+				activeSessions[sessionID] = struct{}{}
+			}
 		case statusCompleted:
-			if !t.Acknowledged {
+			if !t.Acknowledged && isRoot {
 				waiting++
+			}
+			if !t.Acknowledged && sessionID != "" {
+				activeSessions[sessionID] = struct{}{}
 			}
 		}
 	}
@@ -1648,5 +1771,5 @@ func stateSummary(tasks []ipc.Task, notes []ipc.Note, archived []ipc.Note) strin
 	if archivedCount > 0 {
 		notePart = fmt.Sprintf("%s (+%d archived)", notePart, archivedCount)
 	}
-	return fmt.Sprintf("Active %d · Waiting %d · %s · %s", inProgress, waiting, notePart, time.Now().Format(time.Kitchen))
+	return fmt.Sprintf("Sessions %d · Active Tasks %d · Waiting %d · %s · %s", len(activeSessions), activeTasks, waiting, notePart, time.Now().Format(time.Kitchen))
 }

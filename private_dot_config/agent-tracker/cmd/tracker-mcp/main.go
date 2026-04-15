@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -77,8 +78,10 @@ func (c *trackerClient) sendCommand(ctx context.Context, env ipc.Envelope) error
 }
 
 type startInput struct {
-	Summary string `json:"summary"`
-	TmuxID  string `json:"tmux_id"`
+	Summary      string `json:"summary"`
+	TmuxID       string `json:"tmux_id"`
+	TaskID       string `json:"task_id"`
+	ParentTaskID string `json:"parent_task_id"`
 }
 
 func main() {
@@ -104,13 +107,16 @@ func main() {
 			return nil, nil, fmt.Errorf("summary is required")
 		}
 		env := ipc.Envelope{
-			Command:   "start_task",
-			Session:   target.SessionID,
-			SessionID: target.SessionID,
-			Window:    target.WindowID,
-			WindowID:  target.WindowID,
-			Pane:      target.PaneID,
-			Summary:   summary,
+			Command:      "start_task",
+			Source:       detectSource(),
+			TaskID:       strings.TrimSpace(input.TaskID),
+			ParentTaskID: strings.TrimSpace(input.ParentTaskID),
+			Session:      target.SessionID,
+			SessionID:    target.SessionID,
+			Window:       target.WindowID,
+			WindowID:     target.WindowID,
+			Pane:         target.PaneID,
+			Summary:      summary,
 		}
 		if err := client.sendCommand(ctx, env); err != nil {
 			return nil, nil, err
@@ -124,6 +130,55 @@ func main() {
 
 	if err := server.Run(context.Background(), &mcp.StdioTransport{}); err != nil {
 		log.Fatal(err)
+	}
+}
+
+var sourceCleaner = regexp.MustCompile(`[^a-z0-9_-]+`)
+
+func detectSource() string {
+	for _, candidate := range []string{
+		os.Getenv("TRACKER_SOURCE"),
+		os.Getenv("AGENT_TRACKER_SOURCE"),
+		parentProcessName(),
+	} {
+		source := normalizeSource(candidate)
+		if source != "" {
+			return source
+		}
+	}
+	return "unknown"
+}
+
+func parentProcessName() string {
+	commPath := filepath.Join("/proc", fmt.Sprint(os.Getppid()), "comm")
+	if data, err := os.ReadFile(commPath); err == nil {
+		return strings.TrimSpace(string(data))
+	}
+	cmdlinePath := filepath.Join("/proc", fmt.Sprint(os.Getppid()), "cmdline")
+	if data, err := os.ReadFile(cmdlinePath); err == nil {
+		parts := strings.Split(string(data), "\x00")
+		if len(parts) > 0 {
+			return filepath.Base(strings.TrimSpace(parts[0]))
+		}
+	}
+	return ""
+}
+
+func normalizeSource(value string) string {
+	value = strings.TrimSpace(strings.ToLower(value))
+	if value == "" {
+		return ""
+	}
+	value = filepath.Base(value)
+	value = sourceCleaner.ReplaceAllString(value, "-")
+	value = strings.Trim(value, "-")
+	switch {
+	case strings.Contains(value, "opencode"):
+		return "opencode"
+	case strings.Contains(value, "codex"):
+		return "codex"
+	default:
+		return value
 	}
 }
 
