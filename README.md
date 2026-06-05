@@ -4,6 +4,7 @@ My personal terminal setup built around WezTerm, zsh, and Chez Moi. It installs 
 I try to use the same operation method as vim in any way.
 
 ## Quick start (Chez Moi)
+
 - Install Chez Moi: `sh -c "$(curl -fsLS get.chezmoi.io/lb)" -- -b /usr/local/bin`
 - Apply everything: `chezmoi init --apply https://github.com/Immortal-Fates/dotfiles.git`
 - The first apply runs `run_once_install-package-linux.sh`, which installs WezTerm, Oh My Zsh, Starship (pastel-powerline preset), zsh plugins (autojump, autosuggestions, syntax highlighting, vi-mode), JetBrainsMono Nerd Font, clipboard tools, and switches the default shell to zsh.
@@ -12,12 +13,14 @@ I try to use the same operation method as vim in any way.
 - Track new dotfiles: `chezmoi add ~/.<file>` followed by `chezmoi diff` to review.
 
 ## Repo layout
+
 - `dot_zshrc` — shell configuration (plugins, Starship, Conda hook).
 - `private_dot_config/wezterm/wezterm.lua` — WezTerm appearance, keybinds, background.
 - `run_once_install-package-linux.sh` — first-apply installer for dependencies and fonts.
 - `assets/xuenai.png` — terminal background image.
 
 ## Fonts I use
+
 - JetBrainsMono Nerd Font — main terminal + editor font (WezTerm + VS Code).
   - Nerd Fonts repo: https://github.com/ryanoasis/nerd-fonts
   - JetBrains Mono repo: https://github.com/JetBrains/JetBrainsMono
@@ -27,6 +30,7 @@ I try to use the same operation method as vim in any way.
   - Noto Emoji repo: https://github.com/googlefonts/noto-emoji
 
 ## Zsh setup
+
 - Takeaway: I use Oh My Zsh to manage my zsh plugins and starship as my topic.
 - Plugins: Oh My Zsh with plugins:
   - `git` — Git shortcuts and tab completion.
@@ -39,8 +43,9 @@ I try to use the same operation method as vim in any way.
 - Extra env: sourced from `~/.local/bin/env` for local secrets/paths.
 
 ## WezTerm setup
+
 - Takeaway: written in Rust and GPU accelerated so I like it.
-- Fonts/colors: JetBrainsMono Nerd Font + Sarasa Mono SC + Noto Color Emoji, `Catppuccin Mocha`, 80% window opacity, custom background `assets/xuenai.png`.
+- Fonts/colors: JetBrainsMono Nerd Font + Sarasa Mono SC + Noto Color Emoji, `Catppuccin Mocha`, 100% window opacity, custom background `assets/xuenai.png`.
 - Defaults: launches login `zsh`, 120x32 window, small padding, resize-only decorations, no tab-close prompt.
 - Keybinds:
   - `Ctrl+Shift+t/w` new/close tab
@@ -55,7 +60,14 @@ I try to use the same operation method as vim in any way.
 
 Todo
 
+## Vim
 
+- just load this vim config
+
+## Video
+
+- ubuntu: VLC
+- Mac: TODO
 
 ## Browser
 
@@ -64,7 +76,11 @@ No matter what browser are you using. Remember to load the vim extention.
 - Extension list
   - CopyTex: double click to copy tex from AI chat
 
+- ubuntu: I try microsoft-edge and chrome
+- Mac: I want to try dia browser
+
 ## Todo
 
 - [ ] use all the config in lua
 - [ ] add vscode config file
+- [ ] add cc-switch config

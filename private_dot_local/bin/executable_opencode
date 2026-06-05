@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+
+if [ -z "${NVM_BIN:-}" ]; then
+  print -u2 "opencode: NVM_BIN is not set; start zsh or run nvm use --lts first"
+  exit 127
+fi
+
+exec "$NVM_BIN/opencode" "$@"

@@ -1,49 +1,10 @@
 {
   "plugin": [
-    "oh-my-openagent",
-    "opencode-openai-codex-auth",
-    "superpowers@git+https://github.com/obra/superpowers.git"
+    "oh-my-openagent"
   ],
-  "model": "openai/gpt-5.4",
-  "small_model": "openai/gpt-5.4",
-  "default_agent": "planner",
-  "agent": {
-    "planner": {
-      "mode": "primary",
-      "model": "openai/gpt-5.4",
-      "variant": "medium",
-      "description": "Break down work, coordinate subagents, and synthesize final execution plans.",
-      "prompt": "You are the planner for the project at /home/immortal-pc1/ws/projects/obsbot/src/remote-project. The repository is a lightweight MobileOne-style SSD detector for hand/head/face detection. Your job is to improve final detection quality, not just code style. Optimize for measurable gains on the real target metrics in docs/goal.md and docs/tricks-summary.md: preserve or improve the general test set while improving low-light and special color temperature performance, especially hard hand detection and false-positive control. Start by identifying the bottleneck category among data, label assignment, anchors, loss, augmentation, architecture, and post-processing. Break work into concrete subtasks for researcher, coder, reviewer, and tester. Prefer experiments and changes that are likely to move recall at high precision, PR-AUC, and difficult-set robustness. Operational protocol: runtime work happens on the remote server via the ssh MCP, using the remote repository at /root/Test-Example. Long-running training, eval, and tuning jobs must run inside a remote tmux session, not in a fragile foreground shell. After remote runs finish, sync changed configs and experiment outputs back with rsync so local artifacts reflect the remote results. Execution rule: do not stop after writing a plan. Planning is only an internal scaffold. Once you have the first concrete subtasks, immediately delegate them to the dedicated subagents researcher, coder, reviewer, and tester, then continue supervising them in the same session. Use only these four subagents for delegated work unless a different agent is explicitly requested by the user. Do not hand work to explore, librarian, Sisyphus, Planner-Sisyphus, or other legacy plugin agents. After each subagent response, synthesize the result, decide the next highest-value action, and either delegate the next task or execute the coordination step yourself. Continue this loop without asking the user for approval unless there is a real blocker."
-    },
-    "researcher": {
-      "mode": "subagent",
-      "model": "openai/gpt-5.4",
-      "variant": "medium",
-      "description": "Investigate code, docs, and constraints before implementation.",
-      "prompt": "You are the researcher for /home/immortal-pc1/ws/projects/obsbot/src/remote-project. Investigate why final detection quality is limited. Focus on evidence from docs/goal.md, docs/tricks-summary.md, docs/research.md, configs/, scripts/, and src/pd_detector/. Look for bottlenecks in hard-scene generalization, small-object recall, low-light precision, color-temperature shifts, assignment strategy, anchor design, augmentation staging, loss choices, class imbalance, dataset composition, and post-processing thresholds. Compare current best runs such as experiments/model_best and fine_tune_v2 stages against weaker runs, and extract actionable hypotheses ranked by expected impact and implementation cost. When execution evidence is needed, inspect or run on the remote server through the ssh MCP in /root/Test-Example rather than assuming the local environment matches remote. Prefer findings grounded in actual remote logs, metrics, configs, and artifacts. Do not drift into generic ML advice; tie every finding to this repository's actual configs, metrics, and code paths."
-    },
-    "coder": {
-      "mode": "subagent",
-      "model": "openai/gpt-5.4",
-      "variant": "medium",
-      "description": "Implement scoped code changes with minimal diffs.",
-      "prompt": "You are the coder for /home/immortal-pc1/ws/projects/obsbot/src/remote-project. Implement only changes that plausibly improve detector quality or make such improvement easier to test. Prioritize minimal, high-leverage edits in configs, train/eval scripts, assignment logic, losses, anchors, augmentations, and post-processing before proposing large architecture churn. Preserve inference constraints of the lightweight MobileOne-style SSD design unless the task explicitly justifies a model change. Runtime validation belongs on the remote server at /root/Test-Example via ssh MCP. If remote files need updating before an experiment, sync the required code or configs deliberately, run the job in a remote tmux session, and make sure resulting configs and experiment outputs are synced back with rsync. Reuse existing patterns, keep diffs tight, remove dead paths created by the change, and avoid speculative refactors that do not support measurable detection gains."
-    },
-    "reviewer": {
-      "mode": "subagent",
-      "model": "openai/gpt-5.4",
-      "variant": "medium",
-      "description": "Review changes for bugs, regressions, and missing coverage.",
-      "prompt": "You are the reviewer for /home/immortal-pc1/ws/projects/obsbot/src/remote-project. Review proposed changes with a detector-performance mindset. Look for bugs or regressions that could silently hurt final metrics: train/eval mismatch, wrong class filtering, broken anchor order, label assignment mistakes, loss weighting drift, augmentation overreach, threshold misuse, checkpoint/eval path errors, and dataset leakage or distribution skew. Prioritize findings that would reduce recall, inflate false positives, distort PR curves, or invalidate comparisons across experiments. Also review the remote execution workflow: confirm that commands target /root/Test-Example on the remote server through ssh MCP, that long runs are resilient in tmux, and that rsync brings back the exact configs and experiment outputs needed for reproducibility. Cite exact files, configs, and failure modes. Keep summaries brief and findings concrete."
-    },
-    "tester": {
-      "mode": "subagent",
-      "model": "openai/gpt-5.4",
-      "variant": "medium",
-      "description": "Design and run validation steps, then report what passed or failed.",
-      "prompt": "You are the tester for /home/immortal-pc1/ws/projects/obsbot/src/remote-project. Validate changes using the repository's real success criteria: PR-AUC, recall at high precision, difficult-scene robustness, and false-positive behavior on the target datasets in docs/goal.md. Prefer the smallest credible verification that still predicts whether final detection quality improved. Use existing train/eval entrypoints, configs, PR-curve outputs, and metric spreadsheets when possible. Remote execution is the default: run experiments on the remote server in /root/Test-Example through ssh MCP, launch long-running jobs inside a tmux session, monitor their status remotely, and after completion sync back the configs and produced experiment artifacts with rsync. Distinguish clearly between static validation, short proxy runs, and full evaluation. Report exact commands, what was measured, what was synced back, what remains unverified, and whether the evidence is strong enough to trust a metric gain."
-    }
-  },
+  "model": "openai/gpt-5.5-fast",
+  "small_model": "openai/gpt-5.5-fast",
+  "default_agent": "hephaestus",
   "mcp": {
     "tracker": {
       "type": "local",
@@ -88,16 +49,18 @@
     "openai": {
       "name": "OpenAI",
       "models": {
-        "gpt-5.2": {
-          "name": "GPT 5.2 (OAuth)",
+        "gpt-5.5": {
+          "name": "GPT 5.5",
           "limit": {
-            "context": 272000,
-            "output": 128000
+            "context": 1050000,
+            "input": 920000,
+            "output": 130000
           },
           "modalities": {
             "input": [
               "text",
-              "image"
+              "image",
+              "pdf"
             ],
             "output": [
               "text"
@@ -107,109 +70,101 @@
             "none": {
               "reasoningEffort": "none",
               "reasoningSummary": "auto",
-              "textVerbosity": "medium"
+              "include": [
+                "reasoning.encrypted_content"
+              ]
             },
             "low": {
               "reasoningEffort": "low",
               "reasoningSummary": "auto",
-              "textVerbosity": "medium"
+              "include": [
+                "reasoning.encrypted_content"
+              ]
             },
             "medium": {
               "reasoningEffort": "medium",
               "reasoningSummary": "auto",
-              "textVerbosity": "medium"
+              "include": [
+                "reasoning.encrypted_content"
+              ]
             },
             "high": {
               "reasoningEffort": "high",
-              "reasoningSummary": "detailed",
-              "textVerbosity": "medium"
+              "reasoningSummary": "auto",
+              "include": [
+                "reasoning.encrypted_content"
+              ]
             },
             "xhigh": {
               "reasoningEffort": "xhigh",
-              "reasoningSummary": "detailed",
-              "textVerbosity": "medium"
+              "reasoningSummary": "auto",
+              "include": [
+                "reasoning.encrypted_content"
+              ]
             }
           }
         },
-        "gpt-5.2-codex": {
-          "name": "GPT 5.2 Codex (OAuth)",
+        "gpt-5.5-fast": {
+          "name": "GPT 5.5 Fast",
+          "options": {
+            "serviceTier": "priority"
+          },
           "limit": {
-            "context": 272000,
-            "output": 128000
+            "context": 1050000,
+            "input": 920000,
+            "output": 130000
           },
           "modalities": {
             "input": [
               "text",
-              "image"
+              "image",
+              "pdf"
             ],
             "output": [
               "text"
             ]
           },
           "variants": {
+            "none": {
+              "reasoningEffort": "none",
+              "reasoningSummary": "auto",
+              "include": [
+                "reasoning.encrypted_content"
+              ]
+            },
             "low": {
               "reasoningEffort": "low",
               "reasoningSummary": "auto",
-              "textVerbosity": "medium"
+              "include": [
+                "reasoning.encrypted_content"
+              ]
             },
             "medium": {
               "reasoningEffort": "medium",
               "reasoningSummary": "auto",
-              "textVerbosity": "medium"
+              "include": [
+                "reasoning.encrypted_content"
+              ]
             },
             "high": {
               "reasoningEffort": "high",
-              "reasoningSummary": "detailed",
-              "textVerbosity": "medium"
+              "reasoningSummary": "auto",
+              "include": [
+                "reasoning.encrypted_content"
+              ]
             },
             "xhigh": {
               "reasoningEffort": "xhigh",
-              "reasoningSummary": "detailed",
-              "textVerbosity": "medium"
-            }
-          }
-        },
-        "gpt-5.1-codex-max": {
-          "name": "GPT 5.1 Codex Max (OAuth)",
-          "limit": {
-            "context": 272000,
-            "output": 128000
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "variants": {
-            "low": {
-              "reasoningEffort": "low",
-              "reasoningSummary": "detailed",
-              "textVerbosity": "medium"
-            },
-            "medium": {
-              "reasoningEffort": "medium",
-              "reasoningSummary": "detailed",
-              "textVerbosity": "medium"
-            },
-            "high": {
-              "reasoningEffort": "high",
-              "reasoningSummary": "detailed",
-              "textVerbosity": "medium"
-            },
-            "xhigh": {
-              "reasoningEffort": "xhigh",
-              "reasoningSummary": "detailed",
-              "textVerbosity": "medium"
+              "reasoningSummary": "auto",
+              "include": [
+                "reasoning.encrypted_content"
+              ]
             }
           }
         }
       },
       "options": {
-        "reasoningEffort": "medium",
+        "reasoningEffort": "high",
         "reasoningSummary": "auto",
         "textVerbosity": "medium",
         "include": [
