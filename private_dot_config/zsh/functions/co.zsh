@@ -1,5 +1,5 @@
 co() {
-  ensure_tracker_sock || print -u2 "co: warning: tracker socket missing at /run/user/1000/agent-tracker.sock"
+  ensure_tracker_sock || print -u2 "co: warning: tracker socket missing at ${CODEX_TRACKER_SOCKET:-/tmp/agent-tracker.sock}"
   local -a codex_cmd
   codex_cmd=(codex)
   local search_dir=$PWD
@@ -171,7 +171,7 @@ co() {
 }
 
 ensure_tracker_sock() {
-  local sock="/run/user/1000/agent-tracker.sock"
+  local sock="${CODEX_TRACKER_SOCKET:-/tmp/agent-tracker.sock}"
   local link="/tmp/agent-tracker.sock"
 
   if [ ! -S "$sock" ]; then

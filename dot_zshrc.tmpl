@@ -1,6 +1,6 @@
 # OPENSPEC:START
 # OpenSpec shell completions configuration
-fpath=("/home/immortal-pc1/.oh-my-zsh/custom/completions" $fpath)
+fpath=("$HOME/.oh-my-zsh/custom/completions" $fpath)
 # OPENSPEC:END
 
 [ -f "$HOME/.config/zsh/env.zsh" ] && source "$HOME/.config/zsh/env.zsh"
@@ -9,7 +9,7 @@ fpath=("/home/immortal-pc1/.oh-my-zsh/custom/completions" $fpath)
 [ -f "$HOME/.config/zsh/functions/co.zsh" ] && source "$HOME/.config/zsh/functions/co.zsh"
 
 plugins=(git autojump copypath zsh-vi-mode zsh-autosuggestions zsh-syntax-highlighting)
-source $ZSH/oh-my-zsh.sh
+source "$ZSH/oh-my-zsh.sh"
 
 setopt HIST_IGNORE_SPACE
 eval "$(starship init zsh)"
@@ -17,4 +17,6 @@ if command -v codex >/dev/null 2>&1; then
   eval "$(codex completion zsh)"
 fi
 
-. "$HOME/.local/bin/env"
+if [ -f "$HOME/.local/bin/env" ]; then
+  . "$HOME/.local/bin/env"
+fi

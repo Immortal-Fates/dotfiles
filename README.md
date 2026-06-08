@@ -5,18 +5,24 @@ I try to use the same operation method as vim in any way.
 
 ## Quick start (Chez Moi)
 
-- Install Chez Moi: `sh -c "$(curl -fsLS get.chezmoi.io/lb)" -- -b /usr/local/bin`
-- Apply everything: `chezmoi init --apply https://github.com/Immortal-Fates/dotfiles.git`
-- The first apply runs `run_once_install-package-linux.sh`, which installs WezTerm, Oh My Zsh, Starship (pastel-powerline preset), zsh plugins (autojump, autosuggestions, syntax highlighting, vi-mode), JetBrainsMono Nerd Font, clipboard tools, and switches the default shell to zsh.
+- Install Chez Moi on Ubuntu: `sh -c "$(curl -fsLS get.chezmoi.io/lb)" -- -b /usr/local/bin`
+- Install Chez Moi on macOS: `brew install chezmoi` or `sh -c "$(curl -fsLS get.chezmoi.io/lb)" -- -b /usr/local/bin`
+- Preview first: `chezmoi init https://github.com/Immortal-Fates/dotfiles.git && chezmoi diff`
+- Apply everything: `chezmoi apply`
+- The first apply runs an OS-specific installer:
+  - Ubuntu: `run_once_install-package-linux.sh.tmpl`
+  - macOS: `run_once_install-package-darwin.sh.tmpl`
+- The installer sets up WezTerm, Oh My Zsh, Starship (pastel-powerline preset), zsh plugins (autojump, autosuggestions, syntax highlighting, vi-mode), JetBrainsMono Nerd Font, clipboard tools, and switches the default shell to zsh.
 - Pull updates: `chezmoi update`
 - Edit tracked files: `chezmoi cd` then commit as usual.
 - Track new dotfiles: `chezmoi add ~/.<file>` followed by `chezmoi diff` to review.
 
 ## Repo layout
 
-- `dot_zshrc` — shell configuration (plugins, Starship, Conda hook).
+- `dot_zshrc.tmpl` — shell configuration (plugins, Starship, Conda hook).
 - `private_dot_config/wezterm/wezterm.lua` — WezTerm appearance, keybinds, background.
-- `run_once_install-package-linux.sh` — first-apply installer for dependencies and fonts.
+- `run_once_install-package-linux.sh.tmpl` — first-apply Ubuntu installer for dependencies and fonts.
+- `run_once_install-package-darwin.sh.tmpl` — first-apply macOS installer for dependencies and fonts.
 - `assets/xuenai.png` — terminal background image.
 
 ## Fonts I use
