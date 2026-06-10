@@ -4,12 +4,12 @@ return {
     lazy = false,
     priority = 1000,
     opts = {
-      transparent = false,
+      transparent = true,
       on_highlights = function(hl, c)
-        hl.Normal = { bg = "#000000", fg = c.fg }
-        hl.NormalNC = { bg = "#000000", fg = c.fg }
-        hl.SignColumn = { bg = "#000000" }
-        hl.EndOfBuffer = { bg = "#000000", fg = "#000000" }
+        hl.Normal = { bg = "NONE", fg = c.fg }
+        hl.NormalNC = { bg = "NONE", fg = c.fg }
+        hl.SignColumn = { bg = "NONE" }
+        hl.EndOfBuffer = { bg = "NONE", fg = "NONE" }
       end,
     },
     config = function(_, opts)

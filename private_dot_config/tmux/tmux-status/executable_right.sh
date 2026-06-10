@@ -18,15 +18,15 @@ fi
 
 status_bg=$(tmux show -gqv status-bg)
 if [[ -z "$status_bg" || "$status_bg" == "default" ]]; then
-  status_bg=black
+  status_bg="#1a1b26"
 fi
 
-segment_bg="#3b4252"
-segment_fg="#eceff4"
+segment_bg="#24283b"
+segment_fg="#a9b1d6"
 separator=""
 right_cap="█"
-host_bg="${TMUX_THEME_COLOR:-#b294bb}"
-host_fg="#1d1f21"
+host_bg="#6f8fc7"
+host_fg="#1a1b26"
 hostname=$(hostname -s 2>/dev/null || hostname 2>/dev/null || printf 'host')
 
 # --- NET only ---

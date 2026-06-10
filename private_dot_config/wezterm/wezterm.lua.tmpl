@@ -3,6 +3,7 @@
 -- =============================================
 
 local wezterm = require("wezterm")
+local mux = wezterm.mux
 
 local config = {}
 if wezterm.config_builder then
@@ -13,11 +14,20 @@ end
 -- Font & Appearance
 -- =============================================
 
+{{ if eq .chezmoi.os "darwin" -}}
+config.font = wezterm.font_with_fallback({
+  "Lyth Mono Term",
+  "Symbols Nerd Font Mono",
+  "PingFang SC",
+  "Apple Color Emoji",
+})
+{{ else -}}
 config.font = wezterm.font_with_fallback({
   "JetBrainsMono Nerd Font",
   "Sarasa Mono SC",
   "Noto Color Emoji",
 })
+{{ end -}}
 
 config.font_size = 14.0
 
@@ -29,11 +39,11 @@ config.text_background_opacity = 1.0
 config.default_cursor_style = "BlinkingBar"
 
 -- Background picture
-config.window_background_image = wezterm.home_dir .. "/dotfiles/assets/suolong.png"
+-- config.window_background_image = wezterm.home_dir .. "/dotfiles/assets/suolong.png"
 
-config.window_background_image_hsb = {
-  brightness = 0.2,
-}
+-- config.window_background_image_hsb = {
+--  brightness = 0.2,
+-- }
 
 
 -- No title bar or window controls
@@ -49,10 +59,23 @@ config.inactive_pane_hsb = {
 -- Startup & Window Settings
 -- =============================================
 
+{{ if eq .chezmoi.os "darwin" }}
+config.set_environment_variables = {
+  PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+}
+config.send_composed_key_when_left_alt_is_pressed = false
+config.send_composed_key_when_right_alt_is_pressed = false
+{{ end }}
+
 config.default_prog = { "tmux", "new-session", "-A", "-s", "main" }
 
+{{ if eq .chezmoi.os "darwin" }}
+config.initial_cols = 108
+config.initial_rows = 32
+{{ else }}
 config.initial_cols = 210
 config.initial_rows = 56
+{{ end }}
 
 config.window_padding = {
   left = 5,
@@ -61,9 +84,23 @@ config.window_padding = {
   bottom = 5,
 }
 
-config.enable_tab_bar = false
+config.enable_tab_bar = true
 config.hide_tab_bar_if_only_one_tab = true
 config.window_close_confirmation = "NeverPrompt"
+
+{{ if eq .chezmoi.os "darwin" -}}
+wezterm.on("gui-startup", function(cmd)
+  local _, _, window = mux.spawn_window(cmd or {})
+  local gui_window = window:gui_window()
+  local dimensions = gui_window:get_dimensions()
+  local screen = wezterm.gui.screens().active
+
+  gui_window:set_position(
+    screen.x + math.floor((screen.width - dimensions.pixel_width) / 2),
+    screen.y + math.floor((screen.height - dimensions.pixel_height) / 2)
+  )
+end)
+{{ end -}}
 
 -- Enable extended key encodings so tmux can distinguish Ctrl+Alt combos.
 config.enable_csi_u_key_encoding = true
@@ -74,7 +111,22 @@ config.enable_kitty_keyboard = true
 -- =============================================
 
 config.keys = {
-  -- New tab
+  -- New tab/window shortcuts
+  {
+    key = "t",
+    mods = "CMD",
+    action = wezterm.action.SpawnTab("CurrentPaneDomain"),
+  },
+  {
+    key = "t",
+    mods = "CTRL|CMD",
+    action = wezterm.action.SpawnTab("CurrentPaneDomain"),
+  },
+  {
+    key = "n",
+    mods = "CMD",
+    action = wezterm.action.SpawnWindow,
+  },
   {
     key = "t",
     mods = "CTRL|SHIFT",
@@ -82,6 +134,11 @@ config.keys = {
   },
 
   -- Close tab
+  {
+    key = "w",
+    mods = "CMD",
+    action = wezterm.action.CloseCurrentTab({ confirm = false }),
+  },
   {
     key = "w",
     mods = "CTRL|SHIFT",

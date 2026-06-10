@@ -1,5 +1,5 @@
 # Dotfiles (WezTerm + Zsh)
-My personal terminal setup built around WezTerm, zsh, and Chez Moi. It installs a themed WezTerm (Catppuccin, JetBrainsMono Nerd Font + Sarasa Mono SC + Noto Color Emoji, custom background) and an Oh My Zsh shell with Starship plus navigation/productivity plugins.
+My personal terminal setup built around WezTerm, zsh, and Chez Moi. It installs a themed WezTerm (Catppuccin, Lyth Mono Term on macOS, Nerd Font symbols fallback, custom background) and an Oh My Zsh shell with Starship plus navigation/productivity plugins.
 
 I try to use the same operation method as vim in any way.
 
@@ -12,7 +12,7 @@ I try to use the same operation method as vim in any way.
 - The first apply runs an OS-specific installer:
   - Ubuntu: `run_once_install-package-linux.sh.tmpl`
   - macOS: `run_once_install-package-darwin.sh.tmpl`
-- The installer sets up WezTerm, Oh My Zsh, Starship (pastel-powerline preset), zsh plugins (autojump, autosuggestions, syntax highlighting, vi-mode), JetBrainsMono Nerd Font, clipboard tools, and switches the default shell to zsh.
+- The installer sets up WezTerm, Oh My Zsh, Starship (Tokyo Night preset), zsh plugins (autojump, autosuggestions, syntax highlighting, vi-mode), JetBrainsMono Nerd Font, clipboard tools, and switches the default shell to zsh.
 - Pull updates: `chezmoi update`
 - Edit tracked files: `chezmoi cd` then commit as usual.
 - Track new dotfiles: `chezmoi add ~/.<file>` followed by `chezmoi diff` to review.
@@ -27,12 +27,16 @@ I try to use the same operation method as vim in any way.
 
 ## Fonts I use
 
-- JetBrainsMono Nerd Font — main terminal + editor font (WezTerm + VS Code).
+- Lyth Mono Term — main terminal font on macOS.
+- Symbols Nerd Font Mono — prompt icon fallback on macOS.
+- JetBrainsMono Nerd Font — main terminal + editor font elsewhere.
   - Nerd Fonts repo: https://github.com/ryanoasis/nerd-fonts
   - JetBrains Mono repo: https://github.com/JetBrains/JetBrainsMono
-- Sarasa Mono SC — CJK fallback for terminal.
+- PingFang SC — CJK fallback on macOS.
+- Sarasa Mono SC — CJK fallback elsewhere.
   - Sarasa Gothic repo: https://github.com/be5invis/Sarasa-Gothic
-- Noto Color Emoji — emoji fallback in WezTerm.
+- Apple Color Emoji — emoji fallback on macOS.
+- Noto Color Emoji — emoji fallback elsewhere.
   - Noto Emoji repo: https://github.com/googlefonts/noto-emoji
 
 ## Zsh setup
@@ -45,13 +49,13 @@ I try to use the same operation method as vim in any way.
   - `zsh-vi-mode` — modal editing and movement (Esc to enter normal mode; `vv` to edit command in $EDITOR).
   - `zsh-autosuggestions` — ghost text suggestions from history; accept with → or `End`.
   - `zsh-syntax-highlighting` — colors for valid/invalid commands as you type.
-- Prompt: Starship with the pastel-powerline preset (patched Nerd Font). Minimal segments + powerline glyph separators; shows git state, dir, time, and clean exit indicator. Reload/init with `eval "$(starship init zsh)"`.
+- Prompt: Starship with the Tokyo Night preset (patched Nerd Font). Minimal segments + powerline glyph separators; shows git state, dir, runtimes, and clean exit indicator. Reload/init with `eval "$(starship init zsh)"`.
 - Extra env: sourced from `~/.local/bin/env` for local secrets/paths.
 
 ## WezTerm setup
 
 - Takeaway: written in Rust and GPU accelerated so I like it.
-- Fonts/colors: JetBrainsMono Nerd Font + Sarasa Mono SC + Noto Color Emoji, `Catppuccin Mocha`, 100% window opacity, custom background `assets/xuenai.png`.
+- Fonts/colors: Lyth Mono Term on macOS; Nerd Font symbols + CJK and emoji fallbacks; `Catppuccin Mocha`, 100% window opacity, custom background `assets/xuenai.png`.
 - Defaults: launches login `zsh`, 120x32 window, small padding, resize-only decorations, no tab-close prompt.
 - Keybinds:
   - `Ctrl+Shift+t/w` new/close tab
@@ -84,6 +88,10 @@ No matter what browser are you using. Remember to load the vim extention.
 
 - ubuntu: I try microsoft-edge and chrome
 - Mac: I want to try dia browser
+
+## Launcher
+
+- Mac: raycast
 
 ## Todo
 

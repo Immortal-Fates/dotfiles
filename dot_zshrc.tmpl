@@ -17,6 +17,8 @@ if command -v codex >/dev/null 2>&1; then
   eval "$(codex completion zsh)"
 fi
 
+[ -f "$HOME/.config/zsh/keybindings.zsh" ] && source "$HOME/.config/zsh/keybindings.zsh"
+
 if [ -f "$HOME/.local/bin/env" ]; then
   . "$HOME/.local/bin/env"
 fi

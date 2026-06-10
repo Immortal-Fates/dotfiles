@@ -1,0 +1,34 @@
+{{ if eq .chezmoi.os "darwin" }}
+_macos_zsh_keybindings() {
+  for keymap in viins vicmd emacs; do
+    bindkey -M "$keymap" '^[b' backward-word
+    bindkey -M "$keymap" '^[f' forward-word
+    bindkey -M "$keymap" '^[[1;3D' backward-word
+    bindkey -M "$keymap" '^[[1;3C' forward-word
+    bindkey -M "$keymap" '^[[H' beginning-of-line
+    bindkey -M "$keymap" '^[[F' end-of-line
+    bindkey -M "$keymap" '^[[1~' beginning-of-line
+    bindkey -M "$keymap" '^[[4~' end-of-line
+  done
+
+  bindkey -M viins '^[^?' backward-kill-word
+  bindkey -M emacs '^[^?' backward-kill-word
+
+  _tab_accept_or_complete() {
+    if [[ -n "$POSTDISPLAY" ]]; then
+      zle autosuggest-accept
+    else
+      zle expand-or-complete
+    fi
+  }
+  zle -N _tab_accept_or_complete
+  bindkey -M viins '^I' _tab_accept_or_complete
+  bindkey -M emacs '^I' _tab_accept_or_complete
+}
+
+_macos_zsh_keybindings
+
+zvm_after_init() {
+  _macos_zsh_keybindings
+}
+{{ end -}}
