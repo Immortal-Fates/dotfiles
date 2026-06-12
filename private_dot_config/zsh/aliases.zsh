@@ -1,2 +1,6 @@
 alias vim='nvim'
 alias ff='fastfetch'
+alias notion='open -a Notion'
+alias heptabase='open -a Heptabase'
+alias wechat='open -a WeChat'
+alias o='open'
