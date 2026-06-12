@@ -1,6 +1,14 @@
 {{ if eq .chezmoi.os "darwin" }}
 local wezterm_name = "WezTerm"
 
+hs.hotkey.bind({ "alt" }, "h", function()
+  local front = hs.application.frontmostApplication()
+
+  if front then
+    front:hide()
+  end
+end)
+
 hs.hotkey.bind({ "ctrl", "cmd" }, "t", function()
   local front = hs.application.frontmostApplication()
 
