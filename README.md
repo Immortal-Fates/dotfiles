@@ -84,7 +84,7 @@ Todo
 No matter what browser are you using. Remember to load the vim extention.
 
 - Extension list
-  - CopyTex: double click to copy tex from AI chat
+  - Copy LaTeX, I change the default ctrl+c to copy the math formula as markdown latex with $$, chec the https://github.com/Immortal-Fates/copy-latex-chrome-extension#
 
 - ubuntu: I try microsoft-edge and chrome
 - Mac: I want to try dia browser
