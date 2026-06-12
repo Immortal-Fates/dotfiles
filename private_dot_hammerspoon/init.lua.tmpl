@@ -1,11 +1,55 @@
 {{ if eq .chezmoi.os "darwin" }}
 local wezterm_name = "WezTerm"
+local command_h_hotkey
+local app_watcher
+
+local function center_window_in_screen_frame(window)
+  local screen_frame = window:screen():frame()
+  local window_frame = window:frame()
+
+  window_frame.x = screen_frame.x + math.floor((screen_frame.w - window_frame.w) / 2)
+  window_frame.y = screen_frame.y + math.floor((screen_frame.h - window_frame.h) / 2)
+
+  window:setFrame(window_frame, 0)
+end
+
+local function center_wezterm_windows(app)
+  if not app or app:name() ~= wezterm_name then
+    return
+  end
+
+  for _, window in ipairs(app:allWindows()) do
+    if window:isStandard() then
+      center_window_in_screen_frame(window)
+    end
+  end
+end
+
+app_watcher = hs.application.watcher.new(function(app_name, event, app)
+  if app_name == wezterm_name and event == hs.application.watcher.launched then
+    hs.timer.doAfter(0.5, function()
+      center_wezterm_windows(app)
+    end)
+  end
+end)
+
+app_watcher:start()
 
 hs.hotkey.bind({ "alt" }, "h", function()
   local front = hs.application.frontmostApplication()
 
   if front then
     front:hide()
+  end
+end)
+
+command_h_hotkey = hs.hotkey.bind({ "cmd" }, "h", function()
+  local front = hs.application.frontmostApplication()
+
+  if front and front:name() == wezterm_name then
+    command_h_hotkey:disable()
+    hs.eventtap.keyStroke({ "cmd" }, "h", 0, front)
+    command_h_hotkey:enable()
   end
 end)
 
