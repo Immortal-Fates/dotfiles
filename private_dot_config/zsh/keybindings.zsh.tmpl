@@ -14,6 +14,13 @@ _macos_zsh_keybindings() {
   bindkey -M viins '^[^?' backward-kill-word
   bindkey -M emacs '^[^?' backward-kill-word
 
+  _tab_complete_without_autosuggest() {
+    if [[ -n "$POSTDISPLAY" ]]; then
+      zle autosuggest-clear
+    fi
+    zle expand-or-complete
+  }
+
   _up_accept_or_history() {
     if [[ -n "$POSTDISPLAY" ]]; then
       zle autosuggest-accept
@@ -21,9 +28,10 @@ _macos_zsh_keybindings() {
       zle up-line-or-history
     fi
   }
+  zle -N _tab_complete_without_autosuggest
   zle -N _up_accept_or_history
-  bindkey -M viins '^I' expand-or-complete
-  bindkey -M emacs '^I' expand-or-complete
+  bindkey -M viins '^I' _tab_complete_without_autosuggest
+  bindkey -M emacs '^I' _tab_complete_without_autosuggest
   bindkey -M viins '^[[A' _up_accept_or_history
   bindkey -M emacs '^[[A' _up_accept_or_history
 }
