@@ -59,7 +59,7 @@ config.inactive_pane_hsb = {
 -- Startup & Window Settings
 -- =============================================
 
-{{ if eq .chezmoi.os "darwin" }}
+{{ if eq .chezmoi.os "darwin" -}}
 config.set_environment_variables = {
   PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
 }
@@ -69,10 +69,10 @@ config.send_composed_key_when_right_alt_is_pressed = false
 
 config.default_prog = { "tmux", "new-session", "-A", "-s", "main" }
 
-{{ if eq .chezmoi.os "darwin" }}
+{{ if eq .chezmoi.os "darwin" -}}
 config.initial_cols = 108
 config.initial_rows = 32
-{{ else }}
+{{ else -}}
 config.initial_cols = 210
 config.initial_rows = 56
 {{ end }}
@@ -144,19 +144,6 @@ config.keys = {
     mods = "CTRL|SHIFT",
     action = wezterm.action.CloseCurrentTab({ confirm = false }),
   },
-  -- -- Horizontal split
-  -- {
-    -- key = "e",
-    -- mods = "CTRL|SHIFT",
-    -- action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
-  -- },
-
-  -- -- Vertical split
-  -- {
-    -- key = "o",
-    -- mods = "CTRL|SHIFT",
-    -- action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }),
-  -- },
 
   -- Cycle panes
   {
@@ -165,7 +152,41 @@ config.keys = {
     action = wezterm.action.ActivatePaneDirection("Next"),
   },
 
-  -- Ctrl+Alt+1..9 -> send tmux prefix (C-a) then number
+{{ if eq .chezmoi.os "darwin" }}
+  { key = "s", mods = "CTRL|CMD", action = wezterm.action.SendKey({ key = "s", mods = "CTRL|ALT" }) },
+  { key = "w", mods = "CTRL|CMD", action = wezterm.action.SendKey({ key = "w", mods = "CTRL|ALT" }) },
+  { key = "h", mods = "CTRL|CMD", action = wezterm.action.SendKey({ key = "h", mods = "CTRL|ALT" }) },
+  { key = "j", mods = "CTRL|CMD", action = wezterm.action.SendKey({ key = "j", mods = "CTRL|ALT" }) },
+  { key = "k", mods = "CTRL|CMD", action = wezterm.action.SendKey({ key = "k", mods = "CTRL|ALT" }) },
+  { key = "l", mods = "CTRL|CMD", action = wezterm.action.SendKey({ key = "l", mods = "CTRL|ALT" }) },
+
+  { key = "h", mods = "ALT", action = wezterm.action.HideApplication },
+
+  { key = "h", mods = "CMD", action = wezterm.action.SendKey({ key = "h", mods = "ALT" }) },
+  { key = "j", mods = "CMD", action = wezterm.action.SendKey({ key = "j", mods = "ALT" }) },
+  { key = "k", mods = "CMD", action = wezterm.action.SendKey({ key = "k", mods = "ALT" }) },
+  { key = "l", mods = "CMD", action = wezterm.action.SendKey({ key = "l", mods = "ALT" }) },
+
+  { key = "1", mods = "CMD", action = wezterm.action.SendKey({ key = "1", mods = "ALT" }) },
+  { key = "2", mods = "CMD", action = wezterm.action.SendKey({ key = "2", mods = "ALT" }) },
+  { key = "3", mods = "CMD", action = wezterm.action.SendKey({ key = "3", mods = "ALT" }) },
+  { key = "4", mods = "CMD", action = wezterm.action.SendKey({ key = "4", mods = "ALT" }) },
+  { key = "5", mods = "CMD", action = wezterm.action.SendKey({ key = "5", mods = "ALT" }) },
+  { key = "6", mods = "CMD", action = wezterm.action.SendKey({ key = "6", mods = "ALT" }) },
+  { key = "7", mods = "CMD", action = wezterm.action.SendKey({ key = "7", mods = "ALT" }) },
+  { key = "8", mods = "CMD", action = wezterm.action.SendKey({ key = "8", mods = "ALT" }) },
+  { key = "9", mods = "CMD", action = wezterm.action.SendKey({ key = "9", mods = "ALT" }) },
+
+  { key = "1", mods = "CTRL|CMD", action = wezterm.action.SendString("\x01" .. "1") },
+  { key = "2", mods = "CTRL|CMD", action = wezterm.action.SendString("\x01" .. "2") },
+  { key = "3", mods = "CTRL|CMD", action = wezterm.action.SendString("\x01" .. "3") },
+  { key = "4", mods = "CTRL|CMD", action = wezterm.action.SendString("\x01" .. "4") },
+  { key = "5", mods = "CTRL|CMD", action = wezterm.action.SendString("\x01" .. "5") },
+  { key = "6", mods = "CTRL|CMD", action = wezterm.action.SendString("\x01" .. "6") },
+  { key = "7", mods = "CTRL|CMD", action = wezterm.action.SendString("\x01" .. "7") },
+  { key = "8", mods = "CTRL|CMD", action = wezterm.action.SendString("\x01" .. "8") },
+  { key = "9", mods = "CTRL|CMD", action = wezterm.action.SendString("\x01" .. "9") },
+{{ else -}}
   { key = "1", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "1") },
   { key = "2", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "2") },
   { key = "3", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "3") },
@@ -175,8 +196,7 @@ config.keys = {
   { key = "7", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "7") },
   { key = "8", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "8") },
   { key = "9", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "9") },
-
-  -- Pane navigation (handled by tmux; keep Alt+h/j/k/l free)
+{{ end -}}
 }
 
 return config
