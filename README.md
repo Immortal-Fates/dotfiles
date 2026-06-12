@@ -12,7 +12,7 @@ I try to use the same operation method as vim in any way.
 - The first apply runs an OS-specific installer:
   - Ubuntu: `run_once_install-package-linux.sh.tmpl`
   - macOS: `run_once_install-package-darwin.sh.tmpl`
-- The installer sets up WezTerm, Oh My Zsh, Starship (Tokyo Night preset), zsh plugins (autojump, autosuggestions, syntax highlighting, vi-mode), JetBrainsMono Nerd Font, clipboard tools, and switches the default shell to zsh.
+- The installer sets up WezTerm, Oh My Zsh, Starship (Tokyo Night preset), zsh plugins (autojump, autosuggestions, syntax highlighting, vi-mode), Yazi, JetBrainsMono Nerd Font, clipboard tools, and switches the default shell to zsh.
 - Pull updates: `chezmoi update`
 - Edit tracked files: `chezmoi cd` then commit as usual.
 - Track new dotfiles: `chezmoi add ~/.<file>` followed by `chezmoi diff` to review.

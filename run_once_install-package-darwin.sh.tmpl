@@ -22,7 +22,8 @@ if ! brew update; then
 fi
 
 echo "📦 Installing command line packages..."
-brew install git zsh curl neovim fzf tmux autojump starship unzip
+brew install git zsh curl neovim tmux autojump starship unzip yazi ffmpeg-full sevenzip jq poppler fd ripgrep fzf zoxide resvg imagemagick-full font-symbols-only-nerd-font
+brew link ffmpeg-full imagemagick-full -f --overwrite
 
 echo "🖥️ Installing apps and fonts..."
 if brew list --cask wezterm >/dev/null 2>&1; then
