@@ -70,8 +70,8 @@ config.send_composed_key_when_right_alt_is_pressed = false
 config.default_prog = { "tmux", "new-session", "-A", "-s", "main" }
 
 {{ if eq .chezmoi.os "darwin" -}}
-config.initial_cols = 108
-config.initial_rows = 32
+config.initial_cols = 160
+config.initial_rows = 48
 {{ else -}}
 config.initial_cols = 210
 config.initial_rows = 56
@@ -197,6 +197,41 @@ config.keys = {
   { key = "8", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "8") },
   { key = "9", mods = "CTRL|ALT", action = wezterm.action.SendString("\x01" .. "9") },
 {{ end -}}
+}
+
+-- =============================================
+-- Mouse Bindings
+-- =============================================
+
+{{ if eq .chezmoi.os "darwin" -}}
+local open_link_mods = "CMD"
+{{ else -}}
+local open_link_mods = "CTRL"
+{{ end -}}
+
+config.mouse_bindings = {
+  {
+    event = { Up = { streak = 1, button = "Left" } },
+    mods = open_link_mods,
+    action = wezterm.action.OpenLinkAtMouseCursor,
+  },
+  {
+    event = { Down = { streak = 1, button = "Left" } },
+    mods = open_link_mods,
+    action = wezterm.action.Nop,
+  },
+  {
+    event = { Up = { streak = 1, button = "Left" } },
+    mods = open_link_mods,
+    action = wezterm.action.OpenLinkAtMouseCursor,
+    mouse_reporting = true,
+  },
+  {
+    event = { Down = { streak = 1, button = "Left" } },
+    mods = open_link_mods,
+    action = wezterm.action.Nop,
+    mouse_reporting = true,
+  },
 }
 
 return config
