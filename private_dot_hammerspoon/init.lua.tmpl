@@ -3,7 +3,7 @@ local wezterm_name = "WezTerm"
 local typora_name = "Typora"
 local typora_bundle_id = "abnerworks.Typora"
 local command_h_hotkey
-local typora_sidebar_hotkey
+local typora_sidebar_eventtap
 local app_watcher
 
 local function center_window_in_screen_frame(window)
@@ -46,25 +46,18 @@ local function toggle_typora_sidebar()
   end
 end
 
-local function update_typora_sidebar_hotkey()
-  if is_typora_frontmost() then
-    typora_sidebar_hotkey:enable()
-  else
-    typora_sidebar_hotkey:disable()
-  end
-end
+typora_sidebar_eventtap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
+  local flags = event:getFlags()
+  local key = event:getCharactersIgnoringModifiers()
 
-typora_sidebar_hotkey = hs.hotkey.new({ "ctrl" }, "b", function()
-  if is_typora_frontmost() then
-    toggle_typora_sidebar()
+  if key and key:lower() == "b" and flags.ctrl and is_typora_frontmost() then
+    return toggle_typora_sidebar()
   end
+
+  return false
 end)
 
 app_watcher = hs.application.watcher.new(function(app_name, event, app)
-  if event == hs.application.watcher.activated or event == hs.application.watcher.deactivated or event == hs.application.watcher.terminated then
-    hs.timer.doAfter(0, update_typora_sidebar_hotkey)
-  end
-
   if app_name == wezterm_name and event == hs.application.watcher.launched then
     hs.timer.doAfter(0.5, function()
       center_wezterm_windows(app)
@@ -73,8 +66,7 @@ app_watcher = hs.application.watcher.new(function(app_name, event, app)
 end)
 
 app_watcher:start()
-
-update_typora_sidebar_hotkey()
+typora_sidebar_eventtap:start()
 
 hs.hotkey.bind({ "alt" }, "h", function()
   local front = hs.application.frontmostApplication()
