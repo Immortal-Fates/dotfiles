@@ -1,4 +1,4 @@
-const TRACKER_START_SCRIPT = "/home/immortal-pc1/.config/agent-tracker/scripts/auto_start_session.py";
+const TRACKER_START_SCRIPT = "/Users/immortal/.config/agent-tracker/scripts/auto_start_session.py";
 
 async function startTrackerSession(session) {
   const proc = Bun.spawn([

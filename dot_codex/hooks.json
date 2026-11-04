@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/usr/bin/python3 /home/immortal-pc1/.config/agent-tracker/scripts/auto_start_session.py --source codex --from-codex-hook",
+            "command": "/usr/bin/python3 /Users/immortal/.config/agent-tracker/scripts/auto_start_session.py --source codex --from-codex-hook",
             "statusMessage": "Starting tracker session"
           }
         ]

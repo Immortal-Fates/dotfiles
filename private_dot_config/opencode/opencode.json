@@ -9,7 +9,7 @@
     "tracker": {
       "type": "local",
       "command": [
-        "/home/immortal-pc1/.config/agent-tracker/bin/tracker-mcp"
+        "/Users/immortal/.config/agent-tracker/bin/tracker-mcp"
       ],
       "timeout": 20000
     },
