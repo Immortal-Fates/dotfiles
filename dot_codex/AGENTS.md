@@ -47,3 +47,13 @@ Other recommendations:
 - Prefer existing mechanisms
 - Remove dead code, unused imports, debug prints, and extra empty lines.
 - Do not leave temporary scaffolding; revert anything not needed.
+
+## Model Routing
+
+- Use the `planner` agent for planning complex, ambiguous, or multi-step work before implementation.
+- Use the `reviewer` agent for code review, validation strategy, and final checks.
+- Use the `quick_fix` agent for explicit, narrowly scoped changes with a clear implementation.
+- Use the `implementer` agent for substantial implementation work that is already well specified.
+- The primary agent may directly perform substantial implementation because it uses the same model and reasoning effort as `implementer`.
+- Do not use `planner` or `reviewer` to edit files or implement changes.
+- Do not use GPT-5.6 Sol outside planning and checking roles.
