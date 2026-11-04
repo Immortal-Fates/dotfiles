@@ -7,6 +7,28 @@ case ":${PATH}:" in
 esac
 export PATH
 
+NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+_nvm_default_node=""
+if [ -r "$NVM_DIR/alias/default" ]; then
+    IFS= read -r _nvm_default_node < "$NVM_DIR/alias/default"
+    if [ "$_nvm_default_node" = "lts/*" ] && [ -r "$NVM_DIR/alias/lts/*" ]; then
+        IFS= read -r _nvm_default_node < "$NVM_DIR/alias/lts/*"
+    elif [ "${_nvm_default_node#lts/}" != "$_nvm_default_node" ] && [ -r "$NVM_DIR/alias/$_nvm_default_node" ]; then
+        IFS= read -r _nvm_default_node < "$NVM_DIR/alias/$_nvm_default_node"
+    fi
+fi
+if [ -n "$_nvm_default_node" ] && [ -d "$NVM_DIR/versions/node/$_nvm_default_node/bin" ]; then
+    case ":${PATH}:" in
+        *:"$NVM_DIR/versions/node/$_nvm_default_node/bin":*)
+            ;;
+        *)
+            PATH="$NVM_DIR/versions/node/$_nvm_default_node/bin:$PATH"
+            ;;
+    esac
+fi
+export NVM_DIR PATH
+unset _nvm_default_node
+
 if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
 fi
