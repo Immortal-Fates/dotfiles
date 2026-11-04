@@ -1,13 +1,13 @@
 # oh-my-codex top-level settings (must be before any [table])
-notify = ["node", "/home/immortal-pc1/.nvm/versions/node/v24.11.1/lib/node_modules/oh-my-codex/dist/scripts/notify-hook.js"]
-model_reasoning_effort = "high"
+notify = ["node", "/Users/immortal/.nvm/versions/node/v24.16.0/lib/node_modules/oh-my-codex/dist/scripts/notify-hook.js"]
+model_reasoning_effort = "max"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
 developer_instructions = "You have oh-my-codex installed. AGENTS.md is your orchestration brain and the main orchestration surface. Use skill/keyword routing like $name plus spawned role-specialized subagents for specialized work. Codex native subagents are available via .codex/agents and may be used for independent parallel subtasks within a single session or team pane. Skills are loaded from installed SKILL.md files under .codex/skills, not from native agent TOMLs. Use workflow skills via $name when explicitly invoked or clearly routed by AGENTS.md. Treat installed prompts as narrower internal execution surfaces under AGENTS.md authority, even when user-facing docs prefer $name keywords."
 
 
 suppress_unstable_features_warning = true
-model = "gpt-5.5"
+model = "gpt-5.6-luna"
 model_verbosity = "low"
 show_raw_agent_reasoning = true
 exec_timeout_ms = 900000
@@ -64,7 +64,7 @@ hide_full_access_warning = true
 "gpt-5.1-codex-max" = "gpt-5.2-codex"
 
 [features]
-codex_hooks = true
+hooks = true
 streamable_shell = true
 apply_patch_freeform = true
 unified_exec = false
@@ -72,7 +72,7 @@ unified_exec = false
 multi_agent = true
 child_agents_md = true
 [mcp_servers.tracker]
-command = "/home/immortal-pc1/.config/agent-tracker/bin/tracker-mcp"
+command = "/Users/immortal/.config/agent-tracker/bin/tracker-mcp"
 startup_timeout_sec = 20.0
 
 [mcp_servers.tracker.tools.tracker_mark_start_working]
@@ -105,11 +105,11 @@ args = [
   "--username",
   "root",
   "--privateKey",
-  "/home/immortal-pc1/.ssh/id_rsa",
+  "/Users/immortal/.ssh/id_ed25519",
   "--ssh",
-  "{\"name\":\"obsbot\",\"host\":\"connect.nmb2.seetacloud.com\",\"port\":40223,\"username\":\"root\",\"privateKey\":\"/home/immortal-pc1/.ssh/id_rsa\"}",
+  "{\"name\":\"obsbot\",\"host\":\"connect.nmb2.seetacloud.com\",\"port\":40223,\"username\":\"root\",\"privateKey\":\"/Users/immortal/.ssh/id_ed25519\"}",
   "--ssh",
-  "{\"name\":\"obsbot2\",\"host\":\"connect.nmb2.seetacloud.com\",\"port\":46558,\"username\":\"root\",\"privateKey\":\"/home/immortal-pc1/.ssh/id_rsa\"}",
+  "{\"name\":\"obsbot2\",\"host\":\"connect.nmb2.seetacloud.com\",\"port\":46558,\"username\":\"root\",\"privateKey\":\"/Users/immortal/.ssh/id_ed25519\"}",
   "--ssh",
   "{\"name\":\"ldk-10\",\"host\":\"192.168.0.10\",\"port\":22,\"username\":\"ldk\",\"password\":\"123\"}",
   "--ssh",
@@ -140,8 +140,8 @@ max_depth = 2
 
 # OMX State Management MCP Server
 [mcp_servers.omx_state]
-command = "node"
-args = ["/home/immortal-pc1/.nvm/versions/node/v24.11.1/lib/node_modules/oh-my-codex/dist/mcp/state-server.js"]
+command = "omx"
+args = ["mcp-serve", "state"]
 enabled = true
 startup_timeout_sec = 5
 
@@ -150,8 +150,8 @@ approval_mode = "approve"
 
 # OMX Project Memory MCP Server
 [mcp_servers.omx_memory]
-command = "node"
-args = ["/home/immortal-pc1/.nvm/versions/node/v24.11.1/lib/node_modules/oh-my-codex/dist/mcp/memory-server.js"]
+command = "omx"
+args = ["mcp-serve", "memory"]
 enabled = true
 startup_timeout_sec = 5
 
@@ -163,15 +163,15 @@ approval_mode = "approve"
 
 # OMX Code Intelligence MCP Server (LSP diagnostics, AST search)
 [mcp_servers.omx_code_intel]
-command = "node"
-args = ["/home/immortal-pc1/.nvm/versions/node/v24.11.1/lib/node_modules/oh-my-codex/dist/mcp/code-intel-server.js"]
+command = "omx"
+args = ["mcp-serve", "code-intel"]
 enabled = true
 startup_timeout_sec = 10
 
 # OMX Trace MCP Server (agent flow timeline & statistics)
 [mcp_servers.omx_trace]
-command = "node"
-args = ["/home/immortal-pc1/.nvm/versions/node/v24.11.1/lib/node_modules/oh-my-codex/dist/mcp/trace-server.js"]
+command = "omx"
+args = ["mcp-serve", "trace"]
 enabled = true
 startup_timeout_sec = 5
 # ============================================================
